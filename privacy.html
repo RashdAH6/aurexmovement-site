@@ -1,0 +1,456 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>سياسة الخصوصية | Privacy Policy — Aurex Movement</title>
+<meta name="description" content="سياسة الخصوصية الكاملة لمنصة Aurex Movement — كيف نجمع ونحمي بياناتك الشخصية وفق قانون حماية البيانات الإماراتي.">
+<meta name="robots" content="index, follow">
+<link rel="canonical" href="https://aurexmovement.com/privacy">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;500;600&family=Tajawal:wght@300;400;500;700&family=Montserrat:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#050505;--bg2:#111111;--gold:#C9A15B;--white:#F5F5F5;--grey:#A7A7A7;
+  --border:rgba(201,161,91,0.15);--serif:'Cormorant Garamond',Georgia,serif;
+  --ar:'Tajawal',sans-serif;--sans:'Montserrat',sans-serif;
+}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--white);font-family:var(--ar);line-height:1.9;min-height:100vh}
+a{color:var(--gold);text-decoration:none}
+a:hover{text-decoration:underline}
+
+nav{
+  position:sticky;top:0;z-index:99;
+  background:rgba(5,5,5,0.97);backdrop-filter:blur(16px);
+  border-bottom:1px solid var(--border);
+  padding:0 6vw;height:60px;display:flex;align-items:center;justify-content:space-between;
+}
+.nav-logo{font-family:var(--serif);font-size:1.1rem;letter-spacing:.12em;color:var(--gold);text-transform:uppercase}
+.nav-back{font-size:.72rem;letter-spacing:.1em;color:var(--grey);border:1px solid var(--border);padding:.35rem .9rem;cursor:pointer;transition:all .3s;background:transparent}
+.nav-back:hover{border-color:var(--gold);color:var(--gold)}
+
+.hero{
+  padding:5rem 6vw 3rem;
+  border-bottom:1px solid var(--border);
+  background:linear-gradient(180deg,rgba(201,161,91,.04) 0%,transparent 100%);
+}
+.hero-label{font-size:.65rem;letter-spacing:.3em;text-transform:uppercase;color:var(--gold);margin-bottom:1rem}
+.hero h1{font-family:var(--serif);font-size:clamp(2rem,5vw,3.2rem);font-weight:400;color:var(--white);margin-bottom:.5rem}
+.hero h1 em{color:var(--gold);font-style:italic}
+.hero-sub{font-size:.82rem;color:var(--grey);margin-top:.75rem}
+.lang-switch{margin-top:1.5rem;display:flex;gap:.5rem}
+.lang-btn{background:transparent;border:1px solid var(--border);color:var(--grey);padding:.3rem .8rem;font-size:.7rem;letter-spacing:.1em;cursor:pointer;font-family:var(--ar);transition:all .3s}
+.lang-btn.active,.lang-btn:hover{border-color:var(--gold);color:var(--gold)}
+
+.content{max-width:760px;margin:0 auto;padding:4rem 6vw 6rem}
+.updated{font-size:.72rem;color:var(--grey);letter-spacing:.08em;margin-bottom:3rem;padding-bottom:1.5rem;border-bottom:1px solid var(--border)}
+.section{margin-bottom:3rem}
+.section-num{font-size:.65rem;letter-spacing:.25em;text-transform:uppercase;color:var(--gold);margin-bottom:.5rem}
+.section h2{font-family:var(--serif);font-size:1.4rem;font-weight:400;color:var(--white);margin-bottom:1rem}
+.section p,.section li{font-size:.9rem;color:rgba(245,245,245,.75);line-height:2}
+.section ul,.section ol{padding-right:1.5rem;margin-top:.75rem}
+.section li{margin-bottom:.4rem}
+.highlight{background:rgba(201,161,91,.06);border-right:2px solid var(--gold);padding:.75rem 1rem;margin:1rem 0;font-size:.85rem;color:rgba(245,245,245,.8)}
+.table-wrap{overflow-x:auto;margin:1rem 0}
+table{width:100%;border-collapse:collapse;font-size:.82rem}
+th{background:rgba(201,161,91,.08);color:var(--gold);font-weight:500;padding:.6rem .8rem;border:1px solid var(--border);text-align:right}
+td{padding:.6rem .8rem;border:1px solid var(--border);color:rgba(245,245,245,.7);vertical-align:top}
+.divider{height:1px;background:var(--border);margin:3rem 0}
+
+footer{border-top:1px solid var(--border);padding:2rem 6vw;text-align:center;font-size:.72rem;color:var(--grey)}
+footer a{color:var(--gold)}
+
+[lang="en"] body{font-family:var(--sans);direction:ltr}
+[lang="en"] nav{direction:ltr}
+[lang="en"] .highlight{border-right:none;border-left:2px solid var(--gold)}
+[lang="en"] .section ul,[lang="en"] .section ol{padding-right:0;padding-left:1.5rem}
+[lang="en"] th,[lang="en"] td{text-align:left}
+</style>
+</head>
+<body>
+
+<nav>
+  <a class="nav-logo" href="/">Aurex Movement</a>
+  <a class="nav-back" href="/">← العودة للموقع</a>
+</nav>
+
+<div class="hero">
+  <div class="hero-label">قانوني · Legal</div>
+  <h1 id="pageTitle">سياسة <em>الخصوصية</em></h1>
+  <p class="hero-sub" id="pageSubtitle">كيف نجمع بياناتك ونحميها ونستخدمها</p>
+  <div class="lang-switch">
+    <button class="lang-btn active" id="btnAr" onclick="setLang('ar')">العربية</button>
+    <button class="lang-btn" id="btnEn" onclick="setLang('en')">English</button>
+  </div>
+</div>
+
+<div class="content">
+  <p class="updated" id="updatedTxt">آخر تحديث: يونيو 2026</p>
+
+  <!-- AR Content -->
+  <div id="contentAr">
+
+    <div class="section">
+      <div class="section-num">01</div>
+      <h2>مقدمة والتزامنا بخصوصيتك</h2>
+      <p>تلتزم Aurex Movement بحماية خصوصيتك وبياناتك الشخصية وفق أحكام المرسوم بقانون اتحادي رقم (45) لسنة 2021 بشأن حماية البيانات الشخصية في دولة الإمارات العربية المتحدة (PDPL).</p>
+      <div class="highlight">
+        لا نبيع بياناتك الشخصية لأي طرف ثالث. بياناتك تُستخدم فقط لتشغيل المنصة وتحسين تجربتك.
+      </div>
+      <p>تشرح هذه السياسة ما نجمعه من بيانات، ولماذا نجمعها، وكيف نستخدمها، ومدة احتفاظنا بها، وحقوقك كاملةً تجاهها.</p>
+    </div>
+
+    <div class="divider"></div>
+
+    <div class="section">
+      <div class="section-num">02</div>
+      <h2>البيانات التي نجمعها</h2>
+
+      <div class="table-wrap">
+        <table>
+          <tr><th>نوع البيانات</th><th>الأمثلة</th><th>سبب الجمع</th></tr>
+          <tr><td>بيانات الهوية</td><td>الاسم الكامل</td><td>إنشاء الحساب وتعريف المستخدم</td></tr>
+          <tr><td>بيانات التواصل</td><td>البريد الإلكتروني، رقم الواتساب</td><td>التحقق من الهوية وتواصل المشترين</td></tr>
+          <tr><td>بيانات الإعلانات</td><td>صور الساعات، الأسعار، الأوصاف</td><td>عرض الإعلانات على المنصة</td></tr>
+          <tr><td>بيانات التقني</td><td>عنوان IP، نوع المتصفح</td><td>الأمان ومنع الاحتيال</td></tr>
+          <tr><td>بيانات الاستخدام</td><td>الصفحات التي زرتها، الإعلانات التي فتحتها</td><td>تحسين تجربة المستخدم</td></tr>
+        </table>
+      </div>
+
+      <p style="margin-top:1rem">لا نجمع أبداً بيانات الدفع أو بطاقات الائتمان، إذ جميع المدفوعات تتم خارج المنصة مباشرة.</p>
+    </div>
+
+    <div class="divider"></div>
+
+    <div class="section">
+      <div class="section-num">03</div>
+      <h2>كيف نستخدم بياناتك</h2>
+      <p>نستخدم بياناتك الشخصية للأغراض التالية حصراً:</p>
+      <ul>
+        <li>إنشاء وإدارة حسابك على المنصة.</li>
+        <li>عرض إعلاناتك للمشترين المهتمين على الموقع.</li>
+        <li>إرسال رسائل تأكيد إنشاء الحساب أو إعادة تعيين كلمة المرور عبر البريد الإلكتروني.</li>
+        <li>إظهار رقم الواتساب الخاص بك للمشترين بعد ضغطهم على زر "إظهار رقم التواصل".</li>
+        <li>الاستجابة لاستفساراتك وشكاواك.</li>
+        <li>تحسين أداء المنصة وإصلاح المشكلات التقنية.</li>
+        <li>الامتثال للمتطلبات القانونية والتنظيمية المعمول بها في الإمارات.</li>
+      </ul>
+    </div>
+
+    <div class="divider"></div>
+
+    <div class="section">
+      <div class="section-num">04</div>
+      <h2>رقم الواتساب — تنبيه مهم</h2>
+      <div class="highlight">
+        رقم الواتساب الذي تُدخله عند التسجيل أو عند إنشاء إعلان يُعرَض للمشترين المهتمين عند ضغطهم على زر "إظهار رقم التواصل". هذا الأمر ضروري لعمل المنصة كسوق مباشر.
+      </div>
+      <p>باستخدامك للمنصة، أنت توافق صراحةً على إظهار رقمك للمشترين لأغراض التواصل المتعلقة بإعلانك. إن لم تكن موافقاً على ذلك، يرجى عدم إضافة رقم واتساب.</p>
+    </div>
+
+    <div class="divider"></div>
+
+    <div class="section">
+      <div class="section-num">05</div>
+      <h2>مشاركة البيانات مع الأطراف الثالثة</h2>
+      <p><strong>لا نبيع بياناتك لأي طرف ثالث.</strong> نشارك بياناتك فقط في الحالات التالية:</p>
+      <ul>
+        <li><strong>Supabase:</strong> مزود خدمة قاعدة البيانات والمصادقة لدينا. يعمل كمعالج بيانات بموجب اتفاقية معالجة بيانات صارمة.</li>
+        <li><strong>السلطات القانونية:</strong> إذا طُلب منا الكشف عن البيانات بموجب أمر قضائي أو قانوني نافذ.</li>
+        <li><strong>حماية الحقوق:</strong> إذا اعتقدنا بحسن نية أن الكشف ضروري لحماية حقوقنا أو حقوق المستخدمين أو منع الاحتيال.</li>
+      </ul>
+    </div>
+
+    <div class="divider"></div>
+
+    <div class="section">
+      <div class="section-num">06</div>
+      <h2>أمان البيانات</h2>
+      <p>نتخذ التدابير التقنية والتنظيمية التالية لحماية بياناتك:</p>
+      <ul>
+        <li>تشفير جميع الاتصالات بين متصفحك وخوادمنا باستخدام بروتوكول HTTPS/TLS.</li>
+        <li>تخزين كلمات المرور بصيغة مشفّرة (hashed) لا يمكن عكسها.</li>
+        <li>سياسات أمان صارمة (Row Level Security) على قاعدة البيانات تضمن أن كل مستخدم يرى بياناته فقط.</li>
+        <li>مراجعات دورية لأذونات الوصول إلى البيانات.</li>
+      </ul>
+      <p>رغم ذلك، لا يوجد نظام آمن 100%. نوصيك باستخدام كلمة مرور قوية وعدم مشاركة بيانات حسابك مع أحد.</p>
+    </div>
+
+    <div class="divider"></div>
+
+    <div class="section">
+      <div class="section-num">07</div>
+      <h2>ملفات تعريف الارتباط (Cookies)</h2>
+      <p>لا نستخدم ملفات تعريف ارتباط للتتبع الإعلاني. نستخدم فقط:</p>
+      <ul>
+        <li><strong>LocalStorage:</strong> لحفظ تفضيلاتك (اللغة، الوضع الليلي/النهاري) ومعلومات الجلسة.</li>
+        <li><strong>جلسة Supabase:</strong> لإبقائك مسجل الدخول بأمان.</li>
+      </ul>
+      <p>هذه البيانات تُخزَّن محلياً على جهازك ولا تُشارَك مع أي طرف ثالث للإعلانات.</p>
+    </div>
+
+    <div class="divider"></div>
+
+    <div class="section">
+      <div class="section-num">08</div>
+      <h2>مدة الاحتفاظ بالبيانات</h2>
+      <div class="table-wrap">
+        <table>
+          <tr><th>نوع البيانات</th><th>مدة الاحتفاظ</th></tr>
+          <tr><td>بيانات الحساب</td><td>طالما الحساب نشط + 90 يوم بعد الحذف</td></tr>
+          <tr><td>بيانات الإعلانات</td><td>طالما الإعلان منشور + 30 يوم بعد الحذف</td></tr>
+          <tr><td>سجلات الأمان</td><td>12 شهراً لأغراض الأمان ومكافحة الاحتيال</td></tr>
+          <tr><td>المراسلات مع الدعم</td><td>24 شهراً</td></tr>
+        </table>
+      </div>
+      <p style="margin-top:1rem">بعد انتهاء مدة الاحتفاظ، تُحذف البيانات أو تُجهَّل بشكل آمن.</p>
+    </div>
+
+    <div class="divider"></div>
+
+    <div class="section">
+      <div class="section-num">09</div>
+      <h2>حقوقك وفق قانون حماية البيانات الإماراتي (PDPL)</h2>
+      <p>وفق المرسوم بقانون اتحادي رقم (45) لسنة 2021، لديك الحقوق التالية:</p>
+      <ul>
+        <li><strong>حق الاطلاع:</strong> طلب نسخة من البيانات الشخصية التي نحتفظ بها عنك.</li>
+        <li><strong>حق التصحيح:</strong> طلب تصحيح أي بيانات غير دقيقة أو ناقصة.</li>
+        <li><strong>حق الحذف:</strong> طلب حذف بياناتك الشخصية ("الحق في النسيان")، مع مراعاة الالتزامات القانونية.</li>
+        <li><strong>حق الاعتراض:</strong> الاعتراض على معالجة بياناتك لأغراض معينة.</li>
+        <li><strong>حق النقل:</strong> الحصول على بياناتك بصيغة قابلة للقراءة آلياً.</li>
+        <li><strong>حق سحب الموافقة:</strong> سحب موافقتك في أي وقت دون أثر رجعي.</li>
+      </ul>
+      <p>لممارسة أي من هذه الحقوق، تواصل معنا عبر: <a href="mailto:support@aurexmovement.com">support@aurexmovement.com</a></p>
+      <p>نلتزم بالرد خلال <strong>30 يوم عمل</strong> وفق متطلبات القانون.</p>
+    </div>
+
+    <div class="divider"></div>
+
+    <div class="section">
+      <div class="section-num">10</div>
+      <h2>خصوصية القاصرين</h2>
+      <p>لا تستهدف المنصة الأشخاص دون سن 18 عاماً ولا تجمع بياناتهم عن قصد. إن علمنا بأن قاصراً أنشأ حساباً، سنحذف الحساب والبيانات المرتبطة به فوراً.</p>
+    </div>
+
+    <div class="divider"></div>
+
+    <div class="section">
+      <div class="section-num">11</div>
+      <h2>التغييرات على هذه السياسة</h2>
+      <p>قد نُحدِّث سياسة الخصوصية هذه من وقت لآخر. سيُشار إلى تاريخ التحديث في أعلى الصفحة. سنُخطرك بأي تغييرات جوهرية عبر إشعار على الموقع أو بريد إلكتروني. استمرارك في استخدام المنصة بعد نشر التغييرات يُعدّ قبولاً بها.</p>
+    </div>
+
+    <div class="divider"></div>
+
+    <div class="section">
+      <div class="section-num">12</div>
+      <h2>التواصل بشأن الخصوصية</h2>
+      <p>لأي استفسار أو شكوى تتعلق بخصوصيتك أو بياناتك الشخصية:</p>
+      <ul>
+        <li>البريد الإلكتروني: <a href="mailto:support@aurexmovement.com">support@aurexmovement.com</a></li>
+        <li>الموضوع: "طلب خصوصية — Privacy Request"</li>
+      </ul>
+      <p>يحق لك أيضاً تقديم شكوى لدى الهيئة الوطنية لتنظيم الاتصالات (TRA) في دولة الإمارات إن لم تكن راضياً عن استجابتنا.</p>
+    </div>
+
+  </div>
+
+  <!-- EN Content -->
+  <div id="contentEn" style="display:none">
+
+    <div class="section">
+      <div class="section-num">01</div>
+      <h2>Introduction & Our Commitment to Your Privacy</h2>
+      <p>Aurex Movement is committed to protecting your privacy and personal data in accordance with UAE Federal Decree-Law No. (45) of 2021 on Personal Data Protection (PDPL).</p>
+      <div class="highlight">
+        We do not sell your personal data to any third party. Your data is used solely to operate the Platform and improve your experience.
+      </div>
+      <p>This policy explains what data we collect, why we collect it, how we use it, how long we retain it, and your full rights regarding it.</p>
+    </div>
+
+    <div class="divider"></div>
+
+    <div class="section">
+      <div class="section-num">02</div>
+      <h2>Data We Collect</h2>
+      <div class="table-wrap">
+        <table>
+          <tr><th>Data Type</th><th>Examples</th><th>Purpose</th></tr>
+          <tr><td>Identity Data</td><td>Full name</td><td>Account creation and user identification</td></tr>
+          <tr><td>Contact Data</td><td>Email address, WhatsApp number</td><td>Identity verification and buyer contact</td></tr>
+          <tr><td>Listing Data</td><td>Watch photos, prices, descriptions</td><td>Displaying listings on the Platform</td></tr>
+          <tr><td>Technical Data</td><td>IP address, browser type</td><td>Security and fraud prevention</td></tr>
+          <tr><td>Usage Data</td><td>Pages visited, listings viewed</td><td>Improving user experience</td></tr>
+        </table>
+      </div>
+      <p style="margin-top:1rem">We never collect payment data or credit card information, as all payments occur directly off the Platform.</p>
+    </div>
+
+    <div class="divider"></div>
+
+    <div class="section">
+      <div class="section-num">03</div>
+      <h2>How We Use Your Data</h2>
+      <p>We use your personal data exclusively for the following purposes:</p>
+      <ul>
+        <li>Creating and managing your Platform account.</li>
+        <li>Displaying your listings to interested buyers on the site.</li>
+        <li>Sending account confirmation and password reset emails.</li>
+        <li>Showing your WhatsApp number to buyers when they click "Show Contact Number".</li>
+        <li>Responding to your inquiries and complaints.</li>
+        <li>Improving Platform performance and resolving technical issues.</li>
+        <li>Complying with applicable legal and regulatory requirements in the UAE.</li>
+      </ul>
+    </div>
+
+    <div class="divider"></div>
+
+    <div class="section">
+      <div class="section-num">04</div>
+      <h2>WhatsApp Number — Important Notice</h2>
+      <div class="highlight">
+        The WhatsApp number you enter during registration or when creating a listing will be displayed to interested buyers when they click "Show Contact Number". This is essential for the Platform to function as a direct marketplace.
+      </div>
+      <p>By using the Platform, you expressly consent to your number being shown to buyers for contact purposes related to your listing. If you do not consent to this, please do not add a WhatsApp number.</p>
+    </div>
+
+    <div class="divider"></div>
+
+    <div class="section">
+      <div class="section-num">05</div>
+      <h2>Sharing Data with Third Parties</h2>
+      <p><strong>We do not sell your data to any third party.</strong> We share your data only in the following cases:</p>
+      <ul>
+        <li><strong>Supabase:</strong> Our database and authentication service provider, acting as a data processor under a strict data processing agreement.</li>
+        <li><strong>Legal authorities:</strong> If required to disclose data under a valid court order or legal obligation.</li>
+        <li><strong>Rights protection:</strong> If we reasonably believe disclosure is necessary to protect our rights, users' rights, or prevent fraud.</li>
+      </ul>
+    </div>
+
+    <div class="divider"></div>
+
+    <div class="section">
+      <div class="section-num">06</div>
+      <h2>Data Security</h2>
+      <p>We implement the following technical and organizational measures to protect your data:</p>
+      <ul>
+        <li>All communications between your browser and our servers are encrypted using HTTPS/TLS protocol.</li>
+        <li>Passwords are stored in irreversible hashed format.</li>
+        <li>Strict Row Level Security policies on the database ensure each user can only access their own data.</li>
+        <li>Regular reviews of data access permissions.</li>
+      </ul>
+      <p>Despite these measures, no system is 100% secure. We recommend using a strong password and not sharing your account credentials with anyone.</p>
+    </div>
+
+    <div class="divider"></div>
+
+    <div class="section">
+      <div class="section-num">07</div>
+      <h2>Cookies & Local Storage</h2>
+      <p>We do not use advertising tracking cookies. We only use:</p>
+      <ul>
+        <li><strong>LocalStorage:</strong> To save your preferences (language, dark/light mode) and session information.</li>
+        <li><strong>Supabase session:</strong> To keep you securely logged in.</li>
+      </ul>
+      <p>This data is stored locally on your device and is not shared with any third party for advertising purposes.</p>
+    </div>
+
+    <div class="divider"></div>
+
+    <div class="section">
+      <div class="section-num">08</div>
+      <h2>Data Retention Periods</h2>
+      <div class="table-wrap">
+        <table>
+          <tr><th>Data Type</th><th>Retention Period</th></tr>
+          <tr><td>Account data</td><td>While account is active + 90 days after deletion</td></tr>
+          <tr><td>Listing data</td><td>While listing is published + 30 days after deletion</td></tr>
+          <tr><td>Security logs</td><td>12 months for security and fraud prevention purposes</td></tr>
+          <tr><td>Support correspondence</td><td>24 months</td></tr>
+        </table>
+      </div>
+      <p style="margin-top:1rem">After the retention period, data is securely deleted or anonymized.</p>
+    </div>
+
+    <div class="divider"></div>
+
+    <div class="section">
+      <div class="section-num">09</div>
+      <h2>Your Rights Under UAE Personal Data Protection Law (PDPL)</h2>
+      <p>Under UAE Federal Decree-Law No. (45) of 2021, you have the following rights:</p>
+      <ul>
+        <li><strong>Right of Access:</strong> Request a copy of the personal data we hold about you.</li>
+        <li><strong>Right to Rectification:</strong> Request correction of any inaccurate or incomplete data.</li>
+        <li><strong>Right to Erasure:</strong> Request deletion of your personal data ("right to be forgotten"), subject to legal obligations.</li>
+        <li><strong>Right to Object:</strong> Object to processing your data for specific purposes.</li>
+        <li><strong>Right to Portability:</strong> Receive your data in a machine-readable format.</li>
+        <li><strong>Right to Withdraw Consent:</strong> Withdraw your consent at any time without retroactive effect.</li>
+      </ul>
+      <p>To exercise any of these rights, contact us at: <a href="mailto:support@aurexmovement.com">support@aurexmovement.com</a></p>
+      <p>We commit to responding within <strong>30 working days</strong> as required by law.</p>
+    </div>
+
+    <div class="divider"></div>
+
+    <div class="section">
+      <div class="section-num">10</div>
+      <h2>Children's Privacy</h2>
+      <p>The Platform does not target individuals under 18 years of age and does not knowingly collect their data. If we become aware that a minor has created an account, we will immediately delete the account and all associated data.</p>
+    </div>
+
+    <div class="divider"></div>
+
+    <div class="section">
+      <div class="section-num">11</div>
+      <h2>Changes to This Policy</h2>
+      <p>We may update this Privacy Policy from time to time. The update date will be indicated at the top of the page. We will notify you of any material changes via a notice on the site or by email. Continued use of the Platform after changes are posted constitutes acceptance.</p>
+    </div>
+
+    <div class="divider"></div>
+
+    <div class="section">
+      <div class="section-num">12</div>
+      <h2>Privacy Contact</h2>
+      <p>For any privacy inquiry or complaint regarding your personal data:</p>
+      <ul>
+        <li>Email: <a href="mailto:support@aurexmovement.com">support@aurexmovement.com</a></li>
+        <li>Subject line: "Privacy Request — طلب خصوصية"</li>
+      </ul>
+      <p>You also have the right to lodge a complaint with the UAE Telecommunications and Digital Government Regulatory Authority (TDRA) if you are not satisfied with our response.</p>
+    </div>
+
+  </div>
+</div>
+
+<footer>
+  <p>Aurex Movement © 2026 · <a href="/terms">الشروط والأحكام</a> · <a href="/privacy">سياسة الخصوصية</a> · <a href="/">العودة للسوق</a></p>
+</footer>
+
+<script>
+function setLang(lang){
+  document.documentElement.lang = lang;
+  document.documentElement.dir = lang==='ar'?'rtl':'ltr';
+  document.getElementById('contentAr').style.display = lang==='ar'?'block':'none';
+  document.getElementById('contentEn').style.display = lang==='en'?'block':'none';
+  document.getElementById('btnAr').classList.toggle('active', lang==='ar');
+  document.getElementById('btnEn').classList.toggle('active', lang==='en');
+  if(lang==='ar'){
+    document.getElementById('pageTitle').innerHTML = 'سياسة <em style="color:var(--gold);font-style:italic">الخصوصية</em>';
+    document.getElementById('pageSubtitle').textContent = 'كيف نجمع بياناتك ونحميها ونستخدمها';
+    document.getElementById('updatedTxt').textContent = 'آخر تحديث: يونيو 2026';
+    document.querySelector('.nav-back').textContent = '← العودة للموقع';
+  } else {
+    document.getElementById('pageTitle').innerHTML = 'Privacy <em style="color:var(--gold);font-style:italic">Policy</em>';
+    document.getElementById('pageSubtitle').textContent = 'How we collect, protect, and use your data';
+    document.getElementById('updatedTxt').textContent = 'Last updated: June 2026';
+    document.querySelector('.nav-back').textContent = '← Back to site';
+  }
+  localStorage.setItem('aurex_lang', lang);
+}
+const savedLang = localStorage.getItem('aurex_lang') || 'ar';
+setLang(savedLang);
+</script>
+</body>
+</html>

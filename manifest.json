@@ -1,0 +1,43 @@
+{
+  "name": "Aurex Movement",
+  "short_name": "Aurex",
+  "description": "سوق الساعات الفاخرة في الإمارات والخليج | Luxury Watch Marketplace UAE & GCC",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "theme_color": "#050505",
+  "background_color": "#050505",
+  "lang": "ar",
+  "dir": "rtl",
+  "categories": ["shopping", "lifestyle"],
+  "icons": [
+    {
+      "src": "/icon.svg",
+      "type": "image/svg+xml",
+      "sizes": "any",
+      "purpose": "any"
+    },
+    {
+      "src": "/icon-maskable.svg",
+      "type": "image/svg+xml",
+      "sizes": "any",
+      "purpose": "maskable"
+    }
+  ],
+  "screenshots": [],
+  "shortcuts": [
+    {
+      "name": "تصفح الساعات",
+      "short_name": "السوق",
+      "url": "/#listings",
+      "description": "Browse all listings"
+    },
+    {
+      "name": "أضف إعلان",
+      "short_name": "إعلان",
+      "url": "/#post",
+      "description": "Add a listing"
+    }
+  ]
+}

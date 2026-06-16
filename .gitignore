@@ -1,0 +1,13 @@
+# macOS
+.DS_Store
+
+# Local tooling / editor config
+.claude/
+.vscode/
+
+# Node (not used by the site, but just in case)
+node_modules/
+
+# Backups / scratch
+*.backup
+*.bak
