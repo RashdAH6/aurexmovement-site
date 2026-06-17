@@ -345,8 +345,8 @@ function applyTranslations(){
   const fSet = document.getElementById('fSet');
   if(fSet){
     const setOpts = currentLang==='ar'
-      ?['الكل','Full Set','بدون بوكس','بوكس فقط']
-      :['All','Full Set','No Box','Box Only'];
+      ?['الكل','Full Set','بدون بوكس','بوكس فقط','أوراق فقط']
+      :['All','Full Set','No Box','Box Only','Papers Only'];
     Array.from(fSet.options).forEach((o,i)=>{ if(setOpts[i]) o.text=setOpts[i]; });
   }
 

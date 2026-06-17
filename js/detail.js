@@ -40,7 +40,7 @@ function openDetail(id, skipHash){
   showView('detail');
   const L = T[currentLang];
   const locale = currentLang==='ar'?'ar-AE':'en-AE';
-  const waNum = '971'+l.wa.replace(/\D/g,'');
+  const waNum = waNumber(l.wa);
   const waMsg = encodeURIComponent(currentLang==='ar'
     ?'مرحباً، رأيت إعلانك على Aurex Movement بخصوص '+l.brand+' '+l.model+'. هل لا تزال متاحة؟'
     :'Hi, I saw your listing on Aurex Movement for the '+l.brand+' '+l.model+'. Is it still available?');
@@ -49,9 +49,9 @@ function openDetail(id, skipHash){
     ? {name:l.userName, wa:l.wa}
     : {name:currentLang==='ar'?'بائع':'Seller', wa:l.wa};
   const mainImg = l.images&&l.images[0]
-    ? `<img src="${l.images[0]}" alt="${l.brand}">`
+    ? `<img src="${escapeHtml(l.images[0])}" alt="${escapeHtml(l.brand)}">`
     : `<div class="big-placeholder"><svg viewBox="0 0 80 80"><circle cx="40" cy="40" r="28"/><circle cx="40" cy="40" r="20"/><line x1="40" y1="20" x2="40" y2="25"/><line x1="40" y1="55" x2="40" y2="60"/><line x1="20" y1="40" x2="25" y2="40"/><line x1="55" y1="40" x2="60" y2="40"/><line x1="40" y1="40" x2="40" y2="30"/><line x1="40" y1="40" x2="48" y2="43"/></svg></div>`;
-  const thumbs = (l.images||[]).map((img,i)=>`<div class="detail-thumb ${i===0?'active':''}" onclick="swapImg(this,'${img}')"><img src="${img}"></div>`).join('');
+  const thumbs = (l.images||[]).map((img,i)=>`<div class="detail-thumb ${i===0?'active':''}" onclick="swapImg(this,'${escapeHtml(img)}')"><img src="${escapeHtml(img)}" loading="lazy"></div>`).join('');
 
   document.getElementById('detailContent').innerHTML = `
     <div class="detail-imgs">
@@ -59,17 +59,17 @@ function openDetail(id, skipHash){
       ${thumbs?`<div class="detail-thumbs">${thumbs}</div>`:''}
     </div>
     <div class="detail-info">
-      <div class="detail-brand">${l.brand}</div>
-      <h1 class="detail-model">${l.model}</h1>
-      <p class="detail-sub">${[l.ref,l.year,l.dial].filter(Boolean).join(' · ')}</p>
+      <div class="detail-brand">${escapeHtml(l.brand)}</div>
+      <h1 class="detail-model">${escapeHtml(l.model)}</h1>
+      <p class="detail-sub">${escapeHtml([l.ref,l.year,l.dial].filter(Boolean).join(' · '))}</p>
       <div class="detail-price-box">
         <div class="detail-price-label">${currentLang==='ar'?'السعر':'Price'}</div>
         <div class="detail-price">${priceDisplay}</div>
         ${l.negotiable==='yes'?`<div class="detail-price-neg">${L.priceNeg}</div>`:''}
       </div>
       <div class="detail-seller">
-        <div class="seller-avatar">${seller.name.charAt(0)}</div>
-        <div><div class="seller-name">${seller.name}${l.verified?` <span class="verified-badge" title="${currentLang==='ar'?'تاجر موثق':'Verified Seller'}"><svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg></span>`:''}</div><div class="seller-since">${l.verified?(currentLang==='ar'?'تاجر موثق':'Verified Seller'):L.sellerLabel} · ${l.city||'UAE'}</div></div>
+        <div class="seller-avatar">${escapeHtml(seller.name.charAt(0))}</div>
+        <div><div class="seller-name">${escapeHtml(seller.name)}${l.verified?` <span class="verified-badge" title="${currentLang==='ar'?'تاجر موثق':'Verified Seller'}"><svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg></span>`:''}</div><div class="seller-since">${l.verified?(currentLang==='ar'?'تاجر موثق':'Verified Seller'):L.sellerLabel} · ${escapeHtml(l.city||'UAE')}</div></div>
       </div>
       ${l.status==='available'?`
       <div id="contactReveal" class="contact-reveal">
@@ -86,22 +86,22 @@ function openDetail(id, skipHash){
       <div class="detail-specs">
         <h3 class="detail-specs-title">${currentLang==='ar'?'مواصفات الساعة':'Watch Specifications'}</h3>
         <div class="specs-grid">
-          <div class="spec-item"><div class="spec-label">${L.specsBrand}</div><div class="spec-val">${l.brand}</div></div>
-          <div class="spec-item"><div class="spec-label">${L.specsModel}</div><div class="spec-val">${l.model}</div></div>
-          ${l.ref?`<div class="spec-item"><div class="spec-label">${L.specsRef}</div><div class="spec-val">${l.ref}</div></div>`:''}
-          ${l.year?`<div class="spec-item"><div class="spec-label">${L.specsYear}</div><div class="spec-val">${l.year}</div></div>`:''}
-          ${l.condition?`<div class="spec-item"><div class="spec-label">${L.specsCond}</div><div class="spec-val">${l.condition}</div></div>`:''}
-          ${l.set?`<div class="spec-item"><div class="spec-label">${L.specsSet}</div><div class="spec-val">${l.set}</div></div>`:''}
-          ${l.dial?`<div class="spec-item"><div class="spec-label">${L.specsDial}</div><div class="spec-val">${l.dial}</div></div>`:''}
-          ${l.city?`<div class="spec-item"><div class="spec-label">${L.specsCity}</div><div class="spec-val">${l.city}</div></div>`:''}
-          ${l.movement?`<div class="spec-item"><div class="spec-label">${currentLang==='ar'?'الحركة':'Movement'}</div><div class="spec-val">${tSpecVal(l.movement)}</div></div>`:''}
-          ${l.material?`<div class="spec-item"><div class="spec-label">${currentLang==='ar'?'مادة العلبة':'Case Material'}</div><div class="spec-val">${tSpecVal(l.material)}</div></div>`:''}
-          ${l.size?`<div class="spec-item"><div class="spec-label">${currentLang==='ar'?'قياس العلبة':'Case Size'}</div><div class="spec-val">${l.size} ${currentLang==='ar'?'مم':'mm'}</div></div>`:''}
-          ${l.gender?`<div class="spec-item"><div class="spec-label">${currentLang==='ar'?'لمن':'Gender'}</div><div class="spec-val">${tSpecVal(l.gender)}</div></div>`:''}
-          ${l.bracelet?`<div class="spec-item"><div class="spec-label">${currentLang==='ar'?'السوار':'Bracelet'}</div><div class="spec-val">${tSpecVal(l.bracelet)}</div></div>`:''}
+          <div class="spec-item"><div class="spec-label">${L.specsBrand}</div><div class="spec-val">${escapeHtml(l.brand)}</div></div>
+          <div class="spec-item"><div class="spec-label">${L.specsModel}</div><div class="spec-val">${escapeHtml(l.model)}</div></div>
+          ${l.ref?`<div class="spec-item"><div class="spec-label">${L.specsRef}</div><div class="spec-val">${escapeHtml(l.ref)}</div></div>`:''}
+          ${l.year?`<div class="spec-item"><div class="spec-label">${L.specsYear}</div><div class="spec-val">${escapeHtml(l.year)}</div></div>`:''}
+          ${l.condition?`<div class="spec-item"><div class="spec-label">${L.specsCond}</div><div class="spec-val">${escapeHtml(tCond(l.condition))}</div></div>`:''}
+          ${l.set?`<div class="spec-item"><div class="spec-label">${L.specsSet}</div><div class="spec-val">${escapeHtml(tSet(l.set))}</div></div>`:''}
+          ${l.dial?`<div class="spec-item"><div class="spec-label">${L.specsDial}</div><div class="spec-val">${escapeHtml(l.dial)}</div></div>`:''}
+          ${l.city?`<div class="spec-item"><div class="spec-label">${L.specsCity}</div><div class="spec-val">${escapeHtml(l.city)}</div></div>`:''}
+          ${l.movement?`<div class="spec-item"><div class="spec-label">${currentLang==='ar'?'الحركة':'Movement'}</div><div class="spec-val">${escapeHtml(tSpecVal(l.movement))}</div></div>`:''}
+          ${l.material?`<div class="spec-item"><div class="spec-label">${currentLang==='ar'?'مادة العلبة':'Case Material'}</div><div class="spec-val">${escapeHtml(tSpecVal(l.material))}</div></div>`:''}
+          ${l.size?`<div class="spec-item"><div class="spec-label">${currentLang==='ar'?'قياس العلبة':'Case Size'}</div><div class="spec-val">${escapeHtml(l.size)} ${currentLang==='ar'?'مم':'mm'}</div></div>`:''}
+          ${l.gender?`<div class="spec-item"><div class="spec-label">${currentLang==='ar'?'لمن':'Gender'}</div><div class="spec-val">${escapeHtml(tSpecVal(l.gender))}</div></div>`:''}
+          ${l.bracelet?`<div class="spec-item"><div class="spec-label">${currentLang==='ar'?'السوار':'Bracelet'}</div><div class="spec-val">${escapeHtml(tSpecVal(l.bracelet))}</div></div>`:''}
         </div>
       </div>
-      ${l.desc?`<div class="detail-desc"><h3 class="detail-desc-title">${currentLang==='ar'?'وصف البائع':'Seller Description'}</h3><p>${l.desc}</p></div>`:''}
+      ${l.desc?`<div class="detail-desc"><h3 class="detail-desc-title">${currentLang==='ar'?'وصف البائع':'Seller Description'}</h3><p>${escapeHtml(l.desc)}</p></div>`:''}
     </div>
   `;
 }
@@ -111,17 +111,21 @@ function revealContact(id){
   if(!l) return;
   const box = document.getElementById('contactReveal');
   if(!box) return;
-  const waNum = '971' + l.wa.replace(/\D/g,'');
+  const waNum = waNumber(l.wa);
+  const L = T[currentLang];
+  if(!waNum){
+    box.innerHTML = `<div style="background:rgba(167,167,167,.08);border:1px solid rgba(167,167,167,.15);padding:1rem;text-align:center;font-size:.8rem;color:var(--grey)">${currentLang==='ar'?'رقم التواصل غير متوفر':'Contact number unavailable'}</div>`;
+    return;
+  }
   const waMsg = encodeURIComponent(currentLang==='ar'
     ?'مرحباً، رأيت إعلانك على Aurex Movement بخصوص '+l.brand+' '+l.model+'. هل لا تزال متاحة؟'
     :'Hi, I saw your listing on Aurex Movement for the '+l.brand+' '+l.model+'. Is it still available?');
-  const L = T[currentLang];
   box.innerHTML = `
     <a class="detail-cta-wa" href="https://wa.me/${waNum}?text=${waMsg}" target="_blank" rel="nofollow noopener">
       <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.12.554 4.112 1.523 5.843L0 24l6.335-1.505A11.95 11.95 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 21.818c-1.89 0-3.658-.51-5.172-1.397l-.371-.22-3.761.894.938-3.664-.242-.384A9.8 9.8 0 012.182 12C2.182 6.57 6.57 2.182 12 2.182S21.818 6.57 21.818 12 17.43 21.818 12 21.818z"/></svg>
       ${L.contactWa}
     </a>
-    <a class="detail-cta-call" href="tel:+${waNum}" rel="nofollow">📞 +971 ${l.wa}</a>`;
+    <a class="detail-cta-call" href="tel:+${waNum}" rel="nofollow">📞 +${waNum}</a>`;
 }
 
 async function shareListing(id){

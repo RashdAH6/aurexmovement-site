@@ -68,7 +68,7 @@ function renderCard(l, mini=false){
   const L = T[currentLang];
   const locale = currentLang==='ar'?'ar-AE':'en-AE';
   const imgHtml = l.images && l.images[0]
-    ? `<img src="${l.images[0]}" alt="${l.brand} ${l.model}">`
+    ? `<img src="${escapeHtml(l.images[0])}" alt="${escapeHtml(l.brand)} ${escapeHtml(l.model)}" loading="lazy">`
     : `<div class="placeholder-svg"><svg viewBox="0 0 80 80" fill="none" stroke="rgba(201,161,91,0.5)" stroke-width="1"><circle cx="40" cy="40" r="28"/><circle cx="40" cy="40" r="20"/><line x1="40" y1="20" x2="40" y2="25"/><line x1="40" y1="55" x2="40" y2="60"/><line x1="20" y1="40" x2="25" y2="40"/><line x1="55" y1="40" x2="60" y2="40"/><line x1="40" y1="40" x2="40" y2="30"/><line x1="40" y1="40" x2="48" y2="43"/></svg></div>`;
   const badge = l.status==='available'
     ? `<span class="wcard-badge badge-available">${L.available}</span>`
@@ -80,8 +80,8 @@ function renderCard(l, mini=false){
   <div class="wcard" onclick="openDetail('${l.id}')">
     <div class="wcard-img">${isNew}${badge}${favBtnHtml(l.id)}${imgHtml}</div>
     <div class="wcard-body">
-      <div class="wcard-brand">${l.brand}${l.verified?` <span class="verified-mini" title="${currentLang==='ar'?'تاجر موثق':'Verified'}"><svg viewBox="0 0 24 24" width="11" height="11" fill="currentColor"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg></span>`:''}</div>
-      <div class="wcard-model">${l.title || l.model}</div>
+      <div class="wcard-brand">${escapeHtml(l.brand)}${l.verified?` <span class="verified-mini" title="${currentLang==='ar'?'تاجر موثق':'Verified'}"><svg viewBox="0 0 24 24" width="11" height="11" fill="currentColor"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg></span>`:''}</div>
+      <div class="wcard-model">${escapeHtml(l.title || l.model)}</div>
       <div class="wcard-price ${l.negotiable==='yes'?'negotiable':''}">${priceDisplay}</div>
     </div>
   </div>`;
@@ -133,8 +133,8 @@ function renderTopDealers(){
   }
   wrap.innerHTML = dealers.map(d=>`
     <div class="dealer-card">
-      <div class="dealer-avatar">${(d.name||'?').charAt(0).toUpperCase()}</div>
-      <div class="dealer-name">${d.name}${d.verified?` <svg viewBox="0 0 24 24" width="12" height="12" fill="var(--gold)"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>`:''}</div>
+      <div class="dealer-avatar">${escapeHtml((d.name||'?').charAt(0).toUpperCase())}</div>
+      <div class="dealer-name">${escapeHtml(d.name)}${d.verified?` <svg viewBox="0 0 24 24" width="12" height="12" fill="var(--gold)"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>`:''}</div>
       <div class="dealer-count">${d.count} ${currentLang==='ar'?'إعلان':(d.count===1?'listing':'listings')}</div>
     </div>`).join('');
 }
@@ -161,8 +161,8 @@ function filterListings(){
 
   let results = listings.filter(l=>{
     if(brand && l.brand!==brand) return false;
-    if(cond && l.condition!==cond) return false;
-    if(set && !l.set?.includes(set)) return false;
+    if(cond && canonCond(l.condition)!==cond) return false;
+    if(set && canonSet(l.set)!==set) return false;
     if(pMin>0 || pMax<Infinity){
       const pr = Number(l.price);
       if(!l.price || isNaN(pr) || pr<pMin || pr>pMax) return false;

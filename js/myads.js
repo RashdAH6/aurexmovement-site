@@ -47,7 +47,7 @@ async function markSold(id){
   if(!l || l.userId !== currentUser?.id){ toast(currentLang==='ar'?'غير مصرح':'Not authorized'); return; }
   try {
     await sb.from('listings').update({status:'sold'}).eq('id',id).eq('user_id',currentUser.id);
-    await loadListings(true); renderMyAds();
+    await loadListings(true); renderMyAds(); updateStatCount(); renderHomeGrid();
     toast(currentLang==='ar'?'تم تحديث الإعلان كمُباع':'Listing marked as sold');
   } catch(e){ toast('Error: '+e.message); }
 }
