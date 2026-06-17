@@ -62,6 +62,8 @@ async function doLogin(){
       id: user.id,
       name: meta.name || email.split('@')[0],
       wa: meta.whatsapp || '',
+      bio: meta.bio || '',
+      avatar: meta.avatar_url || '',
       email: user.email
     });
   } catch(e){
@@ -104,12 +106,15 @@ function updateNavForUser(){
   const dw = document.getElementById('dropdownWa');
   if(currentUser){
     g.style.display='none'; u.style.display='flex';
-    a.textContent = currentUser.name.charAt(0).toUpperCase();
+    if(a){
+      if(currentUser.avatar){ a.style.backgroundImage=`url("${currentUser.avatar}")`; a.style.backgroundSize='cover'; a.style.backgroundPosition='center'; a.textContent=''; }
+      else { a.style.backgroundImage=''; a.textContent = currentUser.name.charAt(0).toUpperCase(); }
+    }
     if(dn) dn.textContent = currentUser.name;
     if(dw) dw.textContent = '+971 '+currentUser.wa;
   } else {
     g.style.display='flex'; u.style.display='none';
-    if(a) a.textContent='?';
+    if(a){ a.style.backgroundImage=''; a.textContent='?'; }
   }
   refreshAdminUI();
 }

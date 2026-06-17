@@ -13,9 +13,8 @@ async function loadProfile(){
   const wa = currentUser.wa || saved.wa || '';
   const name = currentUser.name || saved.name || '';
 
-  // Update avatar
-  const av = document.getElementById('profileAvatar');
-  if(av) av.textContent = name.charAt(0).toUpperCase();
+  // Update avatar (photo if set, else initial)
+  _applyAvatar(currentUser.avatar || '');
 
   // Update display
   safeText('profileName', name);
@@ -94,6 +93,9 @@ async function saveProfile(){
     return;
   }
 
+  // Mirror name/photo/bio to the public profiles table so OTHER users can see them.
+  sb.from('profiles').upsert({ user_id: currentUser.id, name, avatar_url: currentUser.avatar||null, bio }, { onConflict:'user_id' });
+
   // Save to localStorage (for bio which isn't in auth metadata)
   localStorage.setItem('aurex_profile_'+currentUser.id, JSON.stringify({ name, bio, wa }));
 
@@ -107,6 +109,41 @@ async function saveProfile(){
   if(btn){ btn.disabled = false; btn.textContent = currentLang==='ar'?'حفظ التغييرات':'Save Changes'; }
   loadProfile();
   toast(currentLang==='ar'?'تم حفظ التغييرات ✦':'Changes saved ✦');
+}
+
+// Upload a profile photo: store in Supabase Storage, save the URL to auth metadata
+// (so you see it) and the public profiles table (so buyers + dealer pages see it).
+async function uploadAvatar(input){
+  const file = input && input.files && input.files[0];
+  if(!file || !currentUser) return;
+  if(!file.type.startsWith('image/')){ toast(currentLang==='ar'?'يرجى اختيار صورة':'Please choose an image'); input.value=''; return; }
+  if(file.size > 5*1024*1024){ toast(currentLang==='ar'?'الصورة أكبر من 5 ميجابايت':'Image must be under 5MB'); input.value=''; return; }
+  toast(currentLang==='ar'?'جاري رفع الصورة...':'Uploading photo...');
+  try {
+    const ext = (file.name.split('.').pop()||'jpg').toLowerCase().replace(/[^a-z0-9]/g,'') || 'jpg';
+    const path = `avatars/${currentUser.id}_${Date.now()}.${ext}`;
+    const { error: upErr } = await sb.storage.from('listing-images').upload(path, file, { contentType:file.type, upsert:true });
+    if(upErr) throw upErr;
+    const url = sb.storage.from('listing-images').getPublicUrl(path).data.publicUrl;
+    await sb.auth.updateUser({ data: { avatar_url: url } });
+    sb.from('profiles').upsert({ user_id: currentUser.id, name: currentUser.name||'', avatar_url: url, bio: currentUser.bio||'' }, { onConflict:'user_id' });
+    currentUser.avatar = url;
+    localStorage.setItem('aurex_session', JSON.stringify(currentUser));
+    _applyAvatar(url);
+    updateNavForUser();
+    toast(currentLang==='ar'?'تم تحديث الصورة ✦':'Photo updated ✦');
+  } catch(e){ toast('Error: '+e.message); }
+  input.value='';
+}
+
+// Paint the avatar (photo or initial) into the profile + nav circles.
+function _applyAvatar(url){
+  const initial = ((currentUser&&currentUser.name)||'?').charAt(0).toUpperCase();
+  [document.getElementById('profileAvatar'), document.getElementById('navAvatar')].forEach(el=>{
+    if(!el) return;
+    if(url){ el.style.backgroundImage=`url("${url}")`; el.style.backgroundSize='cover'; el.style.backgroundPosition='center'; el.textContent=''; }
+    else { el.style.backgroundImage=''; el.textContent=initial; }
+  });
 }
 
 async function changePassword(){

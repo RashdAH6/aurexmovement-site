@@ -28,6 +28,7 @@ async function showView(v){
   if(v==='post'){ editingListingId = null; resetPostForm(); }
   if(v==='profile'){ await loadListings(); loadProfile(); }
   if(v==='admin'){ if(!isAdmin()) return showView('home'); await loadListings(); renderAdmin(); }
+  if(v==='dealer'){ await loadListings(); renderDealer(); }
   if(v==='terms'){ renderTerms(); }
 }
 

@@ -15,19 +15,23 @@ async function loadListings(force = false){
   const now = Date.now();
   if(!force && listings.length > 0 && (now - _listingsCacheTime) < LISTINGS_TTL) return;
   try {
-    const [listRes, featRes, verRes] = await Promise.all([
+    const [listRes, featRes, verRes, profRes] = await Promise.all([
       sb.from('listings').select('*').order('created_at', { ascending: false }).limit(500),
       sb.from('featured_listings').select('listing_id,until'),   // may not exist yet — handled gracefully
-      sb.from('verified_sellers').select('user_id')              // may not exist yet — handled gracefully
+      sb.from('verified_sellers').select('user_id'),             // may not exist yet — handled gracefully
+      sb.from('profiles').select('user_id,name,avatar_url')      // may not exist yet — handled gracefully
     ]);
     if(listRes.error) throw listRes.error;
     const featMap = {};
     (featRes.data||[]).forEach(f=>{ if(!f.until || Date.parse(f.until) > now) featMap[f.listing_id] = true; });
     const verSet = new Set((verRes.data||[]).map(v=>v.user_id));
+    const profMap = {};
+    (profRes.data||[]).forEach(p=>{ profMap[p.user_id] = p; });
     listings = (listRes.data||[]).map(l=>({
       id: l.id,
       userId: l.user_id,
-      userName: l.user_name,
+      userName: (profMap[l.user_id] && profMap[l.user_id].name) || l.user_name,
+      sellerAvatar: (profMap[l.user_id] && profMap[l.user_id].avatar_url) || '',
       title: l.title || '',
       brand: l.brand,
       model: l.model,
@@ -213,10 +217,11 @@ function renderTopDealers(){
   const wrap = document.getElementById('topDealers');
   if(!wrap) return;
   const map = {};
-  listings.filter(l=>l.status==='available' && l.userName).forEach(l=>{
-    if(!map[l.userName]) map[l.userName] = { name:l.userName, count:0, verified:false };
-    map[l.userName].count++;
-    if(l.verified) map[l.userName].verified = true;
+  listings.filter(l=>l.status==='available' && l.userId).forEach(l=>{
+    if(!map[l.userId]) map[l.userId] = { id:l.userId, name:l.userName||(currentLang==='ar'?'بائع':'Seller'), avatar:l.sellerAvatar||'', count:0, verified:false };
+    map[l.userId].count++;
+    if(l.verified) map[l.userId].verified = true;
+    if(!map[l.userId].avatar && l.sellerAvatar) map[l.userId].avatar = l.sellerAvatar;
   });
   const dealers = Object.values(map).sort((a,b)=>b.count-a.count).slice(0,8);
   if(dealers.length===0){
@@ -224,11 +229,31 @@ function renderTopDealers(){
     return;
   }
   wrap.innerHTML = dealers.map(d=>`
-    <div class="dealer-card">
-      <div class="dealer-avatar">${escapeHtml((d.name||'?').charAt(0).toUpperCase())}</div>
+    <div class="dealer-card" onclick="openDealer('${d.id}')">
+      <div class="dealer-avatar">${d.avatar?`<img src="${escapeHtml(d.avatar)}" alt="">`:escapeHtml((d.name||'?').charAt(0).toUpperCase())}</div>
       <div class="dealer-name">${escapeHtml(d.name)}${d.verified?` <svg viewBox="0 0 24 24" width="12" height="12" fill="var(--gold)"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>`:''}</div>
       <div class="dealer-count">${d.count} ${currentLang==='ar'?'إعلان':(d.count===1?'listing':'listings')}</div>
     </div>`).join('');
+}
+
+// ── Dealer storefront: a seller's photo + name + their available listings ──
+let currentDealerId = null;
+function openDealer(id){ currentDealerId = id; showView('dealer'); }
+function renderDealer(){
+  const head = document.getElementById('dealerHeader');
+  const grid = document.getElementById('dealerGrid');
+  if(!head || !grid) return;
+  const mine = listings.filter(l=>l.userId===currentDealerId);
+  if(!mine.length){ head.innerHTML=''; grid.innerHTML=`<div style="grid-column:1/-1;text-align:center;padding:3rem;color:var(--grey)">${currentLang==='ar'?'لا توجد إعلانات':'No listings'}</div>`; return; }
+  const ref = mine[0];
+  const avail = mine.filter(l=>l.status==='available');
+  const name = ref.userName || (currentLang==='ar'?'بائع':'Seller');
+  const av = ref.sellerAvatar ? `<img src="${escapeHtml(ref.sellerAvatar)}" alt="">` : escapeHtml(name.charAt(0).toUpperCase());
+  head.innerHTML = `
+    <div class="dealer-hero-avatar">${av}</div>
+    <h1 class="dealer-hero-name">${escapeHtml(name)}${ref.verified?` <span class="verified-badge" title="${currentLang==='ar'?'تاجر موثق':'Verified'}"><svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg></span>`:''}</h1>
+    <div class="dealer-hero-sub">${ref.verified?(currentLang==='ar'?'تاجر موثّق':'Verified Dealer'):(currentLang==='ar'?'بائع':'Seller')} · ${avail.length} ${currentLang==='ar'?'إعلان متاح':'available'}</div>`;
+  grid.innerHTML = avail.length ? avail.map(l=>renderCard(l)).join('') : `<div style="grid-column:1/-1;text-align:center;padding:3rem;color:var(--grey)">${currentLang==='ar'?'لا توجد إعلانات متاحة':'No available listings'}</div>`;
 }
 
 function filterListings(){

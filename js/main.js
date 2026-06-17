@@ -13,6 +13,7 @@ async function init(){
       name: meta.name || session.user.email.split('@')[0],
       wa: meta.whatsapp || '',
       bio: meta.bio || '',
+      avatar: meta.avatar_url || '',
       email: session.user.email
     };
     localStorage.setItem('aurex_session', JSON.stringify(currentUser));
@@ -41,6 +42,7 @@ async function init(){
         name: meta.name || session.user.email.split('@')[0],
         wa: meta.whatsapp || '',
         bio: meta.bio || '',
+        avatar: meta.avatar_url || '',
         email: session.user.email
       };
       localStorage.setItem('aurex_session', JSON.stringify(currentUser));

@@ -553,6 +553,9 @@ function applyTranslations(){
   safeText('profileAdminLbl', currentLang==='ar'?'لوحة الإدارة':'Admin dashboard');
   const _adminS = document.getElementById('adminSearch'); if(_adminS) _adminS.placeholder = currentLang==='ar'?'ابحث عن ساعة أو تاجر...':'Search watches or dealers...';
   if(typeof currentView!=='undefined' && currentView==='admin' && typeof renderAdmin==='function') renderAdmin();
+  // Dealer storefront
+  safeText('dealerBackLbl', currentLang==='ar'?'‹ رجوع':'‹ Back');
+  if(typeof currentView!=='undefined' && currentView==='dealer' && typeof renderDealer==='function') renderDealer();
 
   // Post preview title
   safeText('postPreviewTitle', L.postPreviewTitle);

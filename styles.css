@@ -291,6 +291,18 @@ html[dir="rtl"] .feat-badge{left:auto;right:.7rem}
 .am-sold{font-size:.55rem;color:var(--grey);border:1px solid var(--border);padding:.05rem .35rem;margin-inline-start:.5rem;text-transform:uppercase;letter-spacing:.1em}
 .admin-empty{background:var(--bg2);padding:3rem;text-align:center;color:var(--grey);font-size:.85rem}
 @media(max-width:640px){.am-actions{flex-direction:column}.am-row{flex-wrap:wrap}.admin-search{width:100%}}
+/* ═══ Dealer storefront + avatar images ═══ */
+.dealer-page{max-width:1100px;margin:0 auto;padding:30px 4vw 60px}
+.dealer-back{background:none;border:none;color:var(--grey);font-family:inherit;font-size:.8rem;cursor:pointer;padding:.5rem 0;margin-bottom:1rem}
+.dealer-back:hover{color:var(--gold)}
+.dealer-hero{text-align:center;padding:1rem 0 2rem;border-bottom:1px solid var(--border);margin-bottom:2rem}
+.dealer-hero-avatar{width:96px;height:96px;border-radius:50%;background:var(--gold);color:var(--bg);display:flex;align-items:center;justify-content:center;font-family:var(--serif);font-size:2.4rem;margin:0 auto 1rem;border:2px solid var(--champagne);overflow:hidden}
+.dealer-hero-avatar img{width:100%;height:100%;object-fit:cover}
+.dealer-hero-name{font-family:var(--serif);font-size:clamp(1.5rem,3vw,2.2rem);font-weight:300;display:flex;align-items:center;justify-content:center;gap:.5rem}
+.dealer-hero-sub{font-size:.72rem;letter-spacing:.1em;text-transform:uppercase;color:var(--gold);margin-top:.4rem}
+.dealer-avatar,.seller-avatar{overflow:hidden}
+.dealer-avatar img,.seller-avatar img{width:100%;height:100%;object-fit:cover}
+.nav-avatar{overflow:hidden;background-size:cover;background-position:center}
 .wcard-body{padding:.9rem .95rem 1rem}
 .wcard-brand{font-size:.55rem;letter-spacing:.2em;text-transform:uppercase;color:var(--gold);margin-bottom:.25rem}
 .wcard-model{font-family:var(--serif);font-size:1rem;color:var(--white);line-height:1.3;margin-bottom:.4rem;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;min-height:2.6em}
