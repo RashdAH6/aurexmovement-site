@@ -501,6 +501,8 @@
       </div>
 
       <div id="postFormWrap">
+        <div class="wiz-progress" id="wizProgress"></div>
+        <div class="wstep" data-step="3" hidden>
         <!-- Images -->
         <div class="post-section">
           <span class="post-section-title" id="postSecImages">الصور</span>
@@ -516,8 +518,17 @@
           <input type="file" accept="image/*" style="display:none" id="imgInput" onchange="handleImg(this)">
           <p class="img-note" id="imgNote">JPG, PNG حتى 10MB لكل صورة</p>
           <p class="img-main-note" id="imgMainNote">◈ الصورة الأولى ستظهر كصورة رئيسية في الإعلان</p>
+          <div class="post-field" style="margin-top:1.2rem">
+            <label id="lblWarranty">الضمان</label>
+            <select class="post-select" id="pWarranty">
+              <option value="no">بدون ضمان</option>
+              <option value="yes">يوجد ضمان</option>
+            </select>
+          </div>
         </div>
+        </div><!-- /step3 photos -->
 
+        <div class="wstep" data-step="1">
         <!-- Watch details -->
         <div class="post-section">
           <span class="post-section-title" id="postSecDetails">تفاصيل الساعة</span>
@@ -695,7 +706,9 @@
             </div>
           </div>
         </div>
+        </div><!-- /step1 details -->
 
+        <div class="wstep" data-step="2" hidden>
         <!-- Price & contact -->
         <div class="post-section">
           <span class="post-section-title" id="postSecPrice">السعر والتواصل</span>
@@ -729,6 +742,14 @@
             </select>
           </div>
         </div>
+        </div><!-- /step2 price -->
+
+        <div class="wstep" data-step="4" hidden>
+        <!-- Choose your plan -->
+        <div class="post-section">
+          <span class="post-section-title" id="postSecPlan">اختر باقتك</span>
+          <div class="plan-grid" id="planGrid"></div>
+        </div>
 
         <!-- Preview -->
         <div class="post-preview" id="postPreview">
@@ -750,8 +771,13 @@
           <input type="checkbox" id="pTerms">
           <label for="pTerms" id="termsLabelEl">أؤكد أن المعلومات المدخلة صحيحة وأن الساعة أصيلة 100%. أوافق على قواعد Aurex Movement للبيع والشراء.</label>
         </div>
+        </div><!-- /step4 plan -->
 
-        <button class="btn-primary" id="publishBtnEl" style="width:100%;padding:1rem;font-size:.82rem" onclick="submitListing()">نشر الإعلان الآن</button>
+        <div class="wiz-nav">
+          <button class="btn-secondary" id="wizBackBtn" onclick="wizBack()" style="display:none">‹ رجوع</button>
+          <button class="btn-primary" id="wizNextBtn" onclick="wizNext()" style="flex:1;padding:1rem;font-size:.82rem">التالي ›</button>
+          <button class="btn-primary" id="publishBtnEl" style="display:none;flex:1;padding:1rem;font-size:.82rem" onclick="submitListing()">نشر الإعلان الآن</button>
+        </div>
         <p style="text-align:center;font-size:.72rem;color:rgba(167,167,167,.4);margin-top:.75rem" id="publishHint">سيظهر إعلانك فوراً في السوق بعد النشر</p>
       </div>
 

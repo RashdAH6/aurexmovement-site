@@ -23,11 +23,84 @@ function resetPostForm(){
   updateTitleCounter();
   updateDescCounter();
   document.getElementById('pNeg').value='no';
+  const pw=document.getElementById('pWarranty'); if(pw) pw.value='no';
   document.getElementById('pTerms').checked=false;
   document.getElementById('postPreview').classList.remove('show');
   document.getElementById('successBox').classList.remove('show');
   document.getElementById('postFormWrap').style.display='block';
   renderImgSlots();
+  selectedPlan='free';
+  if(typeof wizShow==='function') wizShow(1);
+}
+
+// ════════════════════════════════════════════════
+// POST WIZARD (multi-step) + plan picker
+// ════════════════════════════════════════════════
+let wizStep = 1;
+const WIZ_TOTAL = 4;
+function wizShow(n){
+  wizStep = Math.max(1, Math.min(WIZ_TOTAL, n));
+  document.querySelectorAll('#postFormWrap .wstep').forEach(s=>{ s.hidden = (parseInt(s.dataset.step,10) !== wizStep); });
+  const back=document.getElementById('wizBackBtn'), next=document.getElementById('wizNextBtn'), pub=document.getElementById('publishBtnEl');
+  if(back) back.style.display = wizStep>1 ? '' : 'none';
+  if(next) next.style.display = wizStep<WIZ_TOTAL ? '' : 'none';
+  if(pub)  pub.style.display  = wizStep===WIZ_TOTAL ? '' : 'none';
+  renderWizProgress();
+  if(wizStep===WIZ_TOTAL){ renderPlanPicker(); if(typeof updatePreview==='function') updatePreview(); }
+  const wrap=document.getElementById('post-page'); if(wrap) wrap.scrollIntoView({behavior:'smooth', block:'start'});
+}
+function wizBack(){ wizShow(wizStep-1); }
+function wizNext(){ if(!wizValidate(wizStep)) return; wizShow(wizStep+1); }
+function wizValidate(n){
+  const ar = currentLang==='ar';
+  const v = id => { const e=document.getElementById(id); return e ? e.value.trim() : ''; };
+  if(n===1){
+    if(!v('pTitle')){ toast(ar?'أدخل عنوان الإعلان':'Enter a listing title'); return false; }
+    if(!v('pBrand')){ toast(ar?'اختر الماركة':'Choose a brand'); return false; }
+    if(!v('pModel')){ toast(ar?'أدخل الموديل':'Enter the model'); return false; }
+    if(!v('pCond')){ toast(ar?'اختر الحالة':'Choose the condition'); return false; }
+  }
+  if(n===2){
+    if(!v('pPrice')){ toast(ar?'أدخل السعر':'Enter the price'); return false; }
+    if((v('pWA')||'').replace(/\D/g,'').length<7){ toast(ar?'أدخل رقم واتساب صحيح':'Enter a valid WhatsApp number'); return false; }
+  }
+  return true;
+}
+function renderWizProgress(){
+  const el=document.getElementById('wizProgress'); if(!el) return;
+  const ar=currentLang==='ar';
+  const labels = ar ? ['التفاصيل','السعر','الصور','الباقة'] : ['Details','Price','Photos','Plan'];
+  el.innerHTML = labels.map((l,i)=>`<div class="wiz-pill ${i+1===wizStep?'active':''} ${i+1<wizStep?'done':''}"><span class="wiz-num">${i+1}</span>${l}</div>`).join('');
+}
+
+// Plans (Phase 1: static display; Phase 2 makes these admin-editable + enforced)
+const AUREX_PLANS = [
+  { id:'free',     name:{ar:'مجاني',en:'Free'},     price:0,     was:9.99, days:7,  featured:0,  refreshes:0, note:{ar:'مجاناً لفترة محدودة عند الإطلاق',en:'Free for a limited launch period'} },
+  { id:'basic',    name:{ar:'أساسي',en:'Basic'},    price:19.99, days:30, featured:0,  refreshes:1 },
+  { id:'featured', name:{ar:'مميّز',en:'Featured'}, price:29.99, days:30, featured:7,  refreshes:2, recommended:true },
+  { id:'premium',  name:{ar:'بريميوم',en:'Premium'},price:59.99, days:60, featured:30, refreshes:4 },
+];
+let selectedPlan = 'free';
+function selectPlan(id){ selectedPlan = id; renderPlanPicker(); }
+function renderPlanPicker(){
+  const wrap=document.getElementById('planGrid'); if(!wrap) return;
+  const ar=currentLang==='ar';
+  wrap.innerHTML = AUREX_PLANS.map(p=>{
+    const price = p.price===0 ? (ar?'مجاني':'FREE') : p.price.toFixed(2)+' AED';
+    const was = p.was ? `<span class="plan-was">${p.was.toFixed(2)} AED</span>` : '';
+    const feats = [
+      `${p.days} ${ar?'يوم':'days'}`,
+      p.featured ? `${p.featured} ${ar?'يوم في المقدمة':'days at the top'}` : null,
+      p.refreshes ? `${p.refreshes}× ${ar?'تحديث للأعلى':'refresh to top'}` : null,
+    ].filter(Boolean);
+    return `<div class="plan-card${selectedPlan===p.id?' sel':''}${p.recommended?' rec':''}" onclick="selectPlan('${p.id}')">
+      ${p.recommended?`<div class="plan-badge">${ar?'موصى به':'Recommended'}</div>`:''}
+      <div class="plan-name">${p.name[ar?'ar':'en']}</div>
+      <div class="plan-price">${was}${price}</div>
+      <ul class="plan-feats">${feats.map(f=>`<li>${f}</li>`).join('')}</ul>
+      ${p.note?`<div class="plan-note">${p.note[ar?'ar':'en']}</div>`:''}
+    </div>`;
+  }).join('');
 }
 
 function renderImgSlots(){
@@ -139,7 +212,7 @@ async function submitListing(){
       dial_color: document.getElementById('pDial').value.trim(),
       condition: cond,
       box_papers: document.getElementById('pSet').value,
-      description: document.getElementById('pDesc').value.trim(),
+      description: (function(){ var d=document.getElementById('pDesc').value.trim(); var w=document.getElementById('pWarranty'); if(!editingListingId && w && w.value==='yes'){ d=(d?d+'\n':'')+(currentLang==='ar'?'✓ يوجد ضمان':'✓ Warranty included'); } return d; })(),
       price: price||null,
       negotiable: document.getElementById('pNeg').value==='yes',
       whatsapp: wa,

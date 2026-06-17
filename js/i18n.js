@@ -560,6 +560,15 @@ function applyTranslations(){
   safeText('googleRegisterLbl', currentLang==='ar'?'المتابعة مع Google':'Continue with Google');
   safeText('authOrLbl1', currentLang==='ar'?'أو':'or');
   safeText('authOrLbl2', currentLang==='ar'?'أو':'or');
+  // Post wizard
+  safeText('postSecPlan', currentLang==='ar'?'اختر باقتك':'Choose your plan');
+  safeText('lblWarranty', currentLang==='ar'?'الضمان':'Warranty');
+  safeText('wizBackBtn', currentLang==='ar'?'‹ رجوع':'‹ Back');
+  safeText('wizNextBtn', currentLang==='ar'?'التالي ›':'Next ›');
+  if(typeof currentView!=='undefined' && currentView==='post'){
+    if(typeof renderWizProgress==='function') renderWizProgress();
+    if(typeof wizStep!=='undefined' && wizStep===4 && typeof renderPlanPicker==='function') renderPlanPicker();
+  }
   if(typeof currentView!=='undefined' && currentView==='dealer' && typeof renderDealer==='function') renderDealer();
 
   // Post preview title

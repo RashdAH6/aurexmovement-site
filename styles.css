@@ -308,6 +308,29 @@ html[dir="rtl"] .feat-badge{left:auto;right:.7rem}
 .btn-google:hover{background:#f1f1f1}
 .auth-divider{display:flex;align-items:center;gap:.7rem;color:var(--grey);font-size:.7rem;margin:.9rem 0;text-transform:uppercase;letter-spacing:.1em}
 .auth-divider::before,.auth-divider::after{content:'';flex:1;height:1px;background:var(--border)}
+/* ═══ Post wizard + plan picker ═══ */
+.wiz-progress{display:flex;gap:.4rem;margin-bottom:1.5rem;flex-wrap:wrap}
+.wiz-pill{flex:1;min-width:68px;display:flex;align-items:center;gap:.4rem;justify-content:center;font-size:.62rem;letter-spacing:.04em;text-transform:uppercase;color:var(--grey);background:var(--bg2);border:1px solid var(--border);padding:.5rem .4rem;border-radius:3px;transition:all .2s}
+.wiz-pill .wiz-num{display:inline-flex;align-items:center;justify-content:center;width:18px;height:18px;border-radius:50%;background:var(--border);color:var(--bg2);font-size:.6rem;font-weight:700;flex-shrink:0}
+.wiz-pill.active{border-color:var(--gold);color:var(--gold)}
+.wiz-pill.active .wiz-num{background:var(--gold);color:var(--bg)}
+.wiz-pill.done{color:var(--champagne)}
+.wiz-pill.done .wiz-num{background:var(--champagne);color:var(--bg)}
+.wiz-nav{display:flex;gap:.7rem;align-items:center;margin-top:1rem}
+.plan-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:.7rem}
+.plan-card{position:relative;background:var(--bg);border:1px solid var(--border);border-radius:6px;padding:1.2rem .9rem .9rem;cursor:pointer;transition:all .2s}
+.plan-card:hover{border-color:var(--gold)}
+.plan-card.sel{border-color:var(--gold);box-shadow:inset 0 0 0 1px var(--gold)}
+.plan-card.rec{border-color:var(--champagne)}
+.plan-badge{position:absolute;top:-9px;left:50%;transform:translateX(-50%);background:linear-gradient(90deg,#c9a15b,#e6c77e);color:#0a0a0a;font-size:.55rem;font-weight:800;letter-spacing:.08em;text-transform:uppercase;padding:.2rem .6rem;border-radius:20px;white-space:nowrap}
+.plan-name{font-size:.62rem;letter-spacing:.18em;text-transform:uppercase;color:var(--gold)}
+.plan-price{font-family:var(--serif);font-size:1.5rem;color:var(--white);margin:.3rem 0 .6rem;display:flex;flex-direction:column;line-height:1.1}
+.plan-was{font-size:.7rem;color:var(--grey);text-decoration:line-through;font-family:var(--ar)}
+.plan-feats{list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:.3rem}
+.plan-feats li{font-size:.72rem;color:var(--grey);padding-inline-start:1rem;position:relative}
+.plan-feats li::before{content:'✓';position:absolute;inset-inline-start:0;color:var(--gold)}
+.plan-note{margin-top:.6rem;font-size:.62rem;color:var(--champagne);line-height:1.5}
+@media(max-width:600px){.plan-grid{grid-template-columns:1fr}.wiz-pill{font-size:.55rem;min-width:0}}
 .wcard-body{padding:.9rem .95rem 1rem}
 .wcard-brand{font-size:.55rem;letter-spacing:.2em;text-transform:uppercase;color:var(--gold);margin-bottom:.25rem}
 .wcard-model{font-family:var(--serif);font-size:1rem;color:var(--white);line-height:1.3;margin-bottom:.4rem;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;min-height:2.6em}
