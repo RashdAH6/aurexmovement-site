@@ -188,6 +188,56 @@ function updatePreview(){
   if(slotImages[0]) pi.innerHTML=`<img src="${slotImages[0]}" style="width:100%;height:100%;object-fit:cover">`;
 }
 
+// AI seller helper: writes the description from the entered watch details (via the /api/ai worker route).
+async function aiWriteListing(){
+  const ar = currentLang==='ar';
+  const val = id => (document.getElementById(id)?.value||'').trim();
+  const brand = val('pBrand'), model = val('pModel');
+  if(!brand && !model){ toast(ar?'اختر الماركة والموديل أولاً':'Choose brand & model first'); return; }
+  const btn = document.getElementById('aiWriteBtn'), lbl = document.getElementById('aiWriteLbl');
+  const prev = lbl ? lbl.textContent : '';
+  if(btn) btn.disabled = true;
+  if(lbl) lbl.textContent = ar?'...جاري الكتابة':'Writing…';
+  try {
+    const res = await fetch('/api/ai', {
+      method:'POST', headers:{'content-type':'application/json'},
+      body: JSON.stringify({ lang: currentLang, brand, model, ref: val('pRef'), year: val('pYear'),
+        condition: val('pCond'), box: val('pSet'), city: val('pCity'), notes: val('pDesc') }),
+    });
+    const data = await res.json().catch(()=>({}));
+    if(!res.ok || !data.description){
+      toast(data.error==='not_configured'
+        ? (ar?'الذكاء الاصطناعي غير مفعّل بعد':'AI isn\'t set up yet')
+        : (ar?'تعذّر إنشاء الوصف، حاول مجدداً':'Couldn\'t generate, try again'));
+      return;
+    }
+    const ta = document.getElementById('pDesc');
+    if(ta){ ta.value = data.description; updateDescCounter(); updatePreview(); }
+    _aiPriceHint(brand, model);
+    toast(ar?'تم إنشاء الوصف ✦':'Description ready ✦');
+  } catch(e){
+    toast(ar?'تعذّر الاتصال':'Connection failed');
+  } finally {
+    if(btn) btn.disabled = false;
+    if(lbl) lbl.textContent = prev || (ar?'اكتب بالذكاء الاصطناعي':'Write with AI');
+  }
+}
+// Price hint grounded in existing Aurex listings of the same brand/model (no AI guessing).
+function _aiPriceHint(brand, model){
+  const el = document.getElementById('aiPriceHint'); if(!el) return;
+  const ar = currentLang==='ar';
+  const m = (model||'').toLowerCase();
+  const peers = (typeof listings!=='undefined'?listings:[]).filter(l=> l.brand===brand && Number(l.price)>0 && (!m || (l.model||'').toLowerCase().includes(m)));
+  if(peers.length < 2){ el.style.display='none'; return; }
+  const prices = peers.map(l=>Number(l.price)).sort((a,b)=>a-b);
+  const f = n => n.toLocaleString(ar?'ar-AE':'en-AE');
+  const avg = Math.round(prices.reduce((a,b)=>a+b,0)/prices.length);
+  el.style.display='block';
+  el.textContent = ar
+    ? `أسعار مشابهة على Aurex: ${peers.length} إعلان · من ${f(prices[0])} إلى ${f(prices[prices.length-1])} · المتوسط ${f(avg)} درهم`
+    : `Similar on Aurex: ${peers.length} listings · ${f(prices[0])}–${f(prices[prices.length-1])} · avg ${f(avg)} AED`;
+}
+
 async function submitListing(){
   const brand=document.getElementById('pBrand').value;
   const model=document.getElementById('pModel').value;

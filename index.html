@@ -692,11 +692,15 @@
             </div>
           </div>
           <div class="post-field">
-            <label id="lblDesc">وصف الساعة</label>
+            <div style="display:flex;align-items:center;justify-content:space-between;gap:.5rem;margin-bottom:.35rem">
+              <label id="lblDesc" style="margin:0">وصف الساعة</label>
+              <button type="button" class="ai-write-btn" id="aiWriteBtn" onclick="aiWriteListing()">✦ <span id="aiWriteLbl">اكتب بالذكاء الاصطناعي</span></button>
+            </div>
             <div style="position:relative">
               <textarea class="post-textarea" id="pDesc" maxlength="1000" placeholder="اكتب أي تفاصيل إضافية تريد أن يعرفها المشتري..." oninput="updateDescCounter();updatePreview()"></textarea>
               <span id="descCounter" style="position:absolute;left:10px;bottom:9px;font-size:.65rem;color:var(--grey)">1000</span>
             </div>
+            <div id="aiPriceHint" style="font-size:.7rem;color:var(--gold);margin-top:.4rem;display:none"></div>
           </div>
         </div>
         </div><!-- /step1 details -->

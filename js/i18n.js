@@ -565,6 +565,7 @@ function applyTranslations(){
   safeText('lblWarranty', currentLang==='ar'?'الضمان':'Warranty');
   const _pw=document.getElementById('pWarranty');
   if(_pw && _pw.options.length>=2){ _pw.options[0].text=currentLang==='ar'?'بدون ضمان':'No Warranty'; _pw.options[1].text=currentLang==='ar'?'يوجد ضمان':'Has Warranty'; }
+  safeText('aiWriteLbl', currentLang==='ar'?'اكتب بالذكاء الاصطناعي':'Write with AI');
   safeText('wizBackBtn', currentLang==='ar'?'‹ رجوع':'‹ Back');
   safeText('wizNextBtn', currentLang==='ar'?'التالي ›':'Next ›');
   if(typeof currentView!=='undefined' && currentView==='post'){

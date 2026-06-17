@@ -295,6 +295,9 @@ html[dir="rtl"] .feat-badge{left:auto;right:.7rem}
 .am-tg.on{background:var(--gold);border-color:var(--gold);color:var(--bg)}
 .am-tg.am-del{border-color:rgba(180,69,47,.5);color:#cc6a5a}
 .am-tg.am-del:hover{background:#b4452f;border-color:#b4452f;color:#fff}
+.ai-write-btn{background:transparent;border:1px solid var(--gold);color:var(--gold);font-family:inherit;font-size:.66rem;letter-spacing:.03em;padding:.3rem .75rem;border-radius:999px;cursor:pointer;white-space:nowrap;transition:all .2s}
+.ai-write-btn:hover{background:var(--gold);color:var(--bg)}
+.ai-write-btn:disabled{opacity:.6;cursor:default}
 .am-sold{font-size:.55rem;color:var(--grey);border:1px solid var(--border);padding:.05rem .35rem;margin-inline-start:.5rem;text-transform:uppercase;letter-spacing:.1em}
 .admin-empty{background:var(--bg2);padding:3rem;text-align:center;color:var(--grey);font-size:.85rem}
 .admin-panel{background:var(--bg2);border:1px solid var(--border);border-radius:6px;padding:1rem;margin-bottom:1rem}
