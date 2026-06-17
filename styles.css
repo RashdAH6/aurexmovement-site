@@ -260,6 +260,12 @@ img{max-width:100%;object-fit:cover}
 }
 html[dir="rtl"] .feat-badge{left:auto;right:.7rem}
 .wcard-feat{box-shadow:0 0 0 1.5px var(--gold), 0 8px 30px rgba(201,161,91,.18)}
+/* Admin-only feature controls on the detail page */
+.admin-bar{display:flex;gap:.5rem;flex-wrap:wrap;align-items:center;margin:.2rem 0 1.2rem;padding:.6rem .7rem;border:1px dashed var(--gold);border-radius:5px;background:rgba(201,161,91,.06)}
+.admin-lbl{font-size:.58rem;letter-spacing:.18em;text-transform:uppercase;color:var(--gold);opacity:.85;margin-inline-end:.2rem}
+.admin-btn{background:transparent;border:1px solid var(--gold);color:var(--gold);font-family:inherit;font-size:.7rem;letter-spacing:.04em;padding:.5rem .85rem;cursor:pointer;border-radius:3px;transition:all .2s}
+.admin-btn:hover{background:var(--gold);color:var(--bg)}
+.admin-btn.admin-on{background:var(--gold);color:var(--bg)}
 .wcard-body{padding:.9rem .95rem 1rem}
 .wcard-brand{font-size:.55rem;letter-spacing:.2em;text-transform:uppercase;color:var(--gold);margin-bottom:.25rem}
 .wcard-model{font-family:var(--serif);font-size:1rem;color:var(--white);line-height:1.3;margin-bottom:.4rem;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;min-height:2.6em}

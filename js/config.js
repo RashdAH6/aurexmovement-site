@@ -8,6 +8,11 @@ const SUPABASE_URL = 'https://udfpwakssijojlsuvqjm.supabase.co';
 const SUPABASE_KEY = 'sb_publishable_pheGlJPG-oM5oPJqQAI1kQ_gYX7lnc_';
 const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
+// Admin (you) — gates the in-app "Feature" controls. The REAL security is the RLS policy
+// on featured_listings (admin email only); this check just shows/hides the buttons.
+const ADMIN_EMAIL = 'rashed.alshamsi731@gmail.com';
+function isAdmin(){ return !!(currentUser && currentUser.email && currentUser.email.toLowerCase() === ADMIN_EMAIL.toLowerCase()); }
+
 // Early function definitions (needed before DOM ready)
 function toggleSettings(){
   const panel = document.getElementById('settingsPanel');

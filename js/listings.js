@@ -117,6 +117,26 @@ function renderVerified(){
   wrap.innerHTML = v.map(l=>renderCard(l)).join('');
 }
 
+// ── Admin: feature / unfeature a listing (RLS lets ONLY the admin email write) ──
+async function adminSetFeatured(id, days){
+  if(!isAdmin()) return;
+  const row = { listing_id: id };
+  if(days > 0){ row.until = new Date(Date.now() + days*86400000).toISOString(); }
+  const { error } = await sb.from('featured_listings').upsert(row, { onConflict: 'listing_id' });
+  if(error){ toast('Error: ' + error.message); return; }
+  await loadListings(true);
+  toast(currentLang==='ar' ? 'تم التمييز ✦' : 'Featured ✦');
+  openDetail(id, true);
+}
+async function adminUnfeature(id){
+  if(!isAdmin()) return;
+  const { error } = await sb.from('featured_listings').delete().eq('listing_id', id);
+  if(error){ toast('Error: ' + error.message); return; }
+  await loadListings(true);
+  toast(currentLang==='ar' ? 'أُزيل التمييز' : 'Removed from featured');
+  openDetail(id, true);
+}
+
 // Switch the home content tab (Latest / Top Dealers / Brands / Verified)
 function homeTab(name){
   document.querySelectorAll('.home-tab').forEach(t=>t.classList.toggle('active', t.dataset.tab===name));

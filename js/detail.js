@@ -83,6 +83,10 @@ function openDetail(id, skipHash){
         <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
         ${currentLang==='ar'?'مشاركة الإعلان':'Share Listing'}
       </button>
+      ${isAdmin()?`<div class="admin-bar"><span class="admin-lbl">${currentLang==='ar'?'إدارة':'Admin'}</span>${isFeatured(l)
+        ? `<button class="admin-btn admin-on" onclick="adminUnfeature('${l.id}')">✓ ${currentLang==='ar'?'مميّز — إزالة':'Featured — Remove'}</button>`
+        : `<button class="admin-btn" onclick="adminSetFeatured('${l.id}',30)">★ ${currentLang==='ar'?'تمييز 30 يوم':'Feature 30 days'}</button><button class="admin-btn" onclick="adminSetFeatured('${l.id}',0)">★ ${currentLang==='ar'?'تمييز دائم':'Feature — no expiry'}</button>`
+      }</div>`:''}
       <div class="detail-specs">
         <h3 class="detail-specs-title">${currentLang==='ar'?'مواصفات الساعة':'Watch Specifications'}</h3>
         <div class="specs-grid">
