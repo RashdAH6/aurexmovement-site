@@ -48,6 +48,7 @@ function closeAvatarMenu(){
 // ════════════════════════════════════════════════
 let currentUser = null;
 let listings = [];
+let PLANS = null; // listing plans loaded from DB (falls back to the static AUREX_PLANS)
 let favorites = [];
 let currentView = 'home';
 let previousView = 'home';

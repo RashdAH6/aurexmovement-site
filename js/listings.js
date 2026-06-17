@@ -15,11 +15,12 @@ async function loadListings(force = false){
   const now = Date.now();
   if(!force && listings.length > 0 && (now - _listingsCacheTime) < LISTINGS_TTL) return;
   try {
-    const [listRes, featRes, verRes, profRes] = await Promise.all([
+    const [listRes, featRes, verRes, profRes, planRes] = await Promise.all([
       sb.from('listings').select('*').order('created_at', { ascending: false }).limit(500),
       sb.from('featured_listings').select('listing_id,until'),   // may not exist yet — handled gracefully
       sb.from('verified_sellers').select('user_id'),             // may not exist yet — handled gracefully
-      sb.from('profiles').select('user_id,name,avatar_url')      // may not exist yet — handled gracefully
+      sb.from('profiles').select('user_id,name,avatar_url'),     // may not exist yet — handled gracefully
+      sb.from('plans').select('*').order('sort')                 // may not exist yet — handled gracefully
     ]);
     if(listRes.error) throw listRes.error;
     const featMap = {};
@@ -27,6 +28,14 @@ async function loadListings(force = false){
     const verSet = new Set((verRes.data||[]).map(v=>v.user_id));
     const profMap = {};
     (profRes.data||[]).forEach(p=>{ profMap[p.user_id] = p; });
+    if(planRes.data && planRes.data.length){
+      PLANS = planRes.data.filter(p=>p.active!==false).map(p=>({
+        id:p.id, name:{ar:p.label_ar||p.id, en:p.label_en||p.id}, price:Number(p.price)||0,
+        days:p.days||0, featured:p.featured_days||0, refreshes:p.refreshes||0, recommended:!!p.recommended,
+        was:(Number(p.price)||0)===0?9.99:null,
+        note:(Number(p.price)||0)===0?{ar:'مجاناً لفترة محدودة عند الإطلاق',en:'Free for a limited launch period'}:null
+      }));
+    }
     listings = (listRes.data||[]).map(l=>({
       id: l.id,
       userId: l.user_id,
@@ -55,6 +64,11 @@ async function loadListings(force = false){
       verified: verSet.has(l.user_id) || l.seller_verified === true,
       createdAt: new Date(l.created_at).getTime(),
       featured: !!featMap[l.id],
+      plan: l.plan || null,
+      planStatus: l.plan_status || 'active',
+      expiresAt: l.expires_at || null,
+      refreshesLeft: l.refreshes_left || 0,
+      warranty: l.warranty === true,
     }));
     _listingsCacheTime = now;
   } catch(e) {
@@ -104,7 +118,7 @@ function renderHomeGrid(){
   const grid = document.getElementById('homeGrid');
   const empty = document.getElementById('homeEmpty');
   if(!grid) return;
-  const recent = [...listings].filter(l=>l.status==='available').sort((a,b)=> ((isFeatured(b)?1:0)-(isFeatured(a)?1:0)) || (b.createdAt-a.createdAt)).slice(0,6);
+  const recent = [...listings].filter(l=>isLive(l)).sort((a,b)=> ((isFeatured(b)?1:0)-(isFeatured(a)?1:0)) || (b.createdAt-a.createdAt)).slice(0,6);
   if(recent.length===0){ grid.style.display='none'; empty.style.display='block'; }
   else { grid.style.display='grid'; empty.style.display='none'; grid.innerHTML=recent.map(l=>renderCard(l)).join(''); }
   renderTopDealers();
@@ -115,7 +129,7 @@ function renderHomeGrid(){
 function renderVerified(){
   const wrap = document.getElementById('verifiedGrid');
   if(!wrap) return;
-  const v = listings.filter(l=>l.verified && l.status==='available');
+  const v = listings.filter(l=>l.verified && isLive(l));
   if(v.length===0){
     wrap.innerHTML = `<div style="grid-column:1/-1;text-align:center;padding:3rem;color:var(--grey);font-size:.85rem">${currentLang==='ar'?'لا توجد ساعات من تجار موثّقين بعد':'No watches from verified dealers yet'}</div>`;
     return;
@@ -168,27 +182,72 @@ function _adminAfter(){
   else if(currentDetailId) openDetail(currentDetailId, true);
 }
 
-// Admin dashboard: every listing as a row with one-click Feature / Verify toggles.
+// Admin dashboard: metrics + pending approvals + plans editor + listing rows.
 function renderAdmin(){
-  const wrap = document.getElementById('adminList'); if(!wrap) return;
   const ar = currentLang==='ar';
-  const q = (document.getElementById('adminSearch')?.value||'').trim().toLowerCase();
-  const live = listings.filter(l=>l.status==='available').length;
+  const live = listings.filter(l=>isLive(l)).length;
   const featCount = listings.filter(l=>isFeatured(l)).length;
+  const pending = listings.filter(l=>l.planStatus==='pending');
   const verDealers = new Set(listings.filter(l=>l.verified && l.userId).map(l=>l.userId)).size;
   const m = document.getElementById('adminMetrics');
   if(m) m.innerHTML = [
-    [ar?'إعلانات متاحة':'Live watches', live],
+    [ar?'إعلانات حيّة':'Live', live],
     [ar?'مميّزة':'Featured', featCount],
-    [ar?'تجار موثّقون':'Verified dealers', verDealers]
+    [ar?'بانتظار الدفع':'Pending', pending.length],
+    [ar?'تجار موثّقون':'Verified', verDealers]
   ].map(x=>`<div class="admin-metric"><div class="am-lbl">${x[0]}</div><div class="am-num">${x[1]}</div></div>`).join('');
-  let rows = listings.slice();
-  if(q) rows = rows.filter(l=>((l.brand||'')+' '+(l.model||'')+' '+(l.title||'')+' '+(l.userName||'')).toLowerCase().includes(q));
-  if(!rows.length){ wrap.innerHTML = `<div class="admin-empty">${ar?'لا توجد نتائج':'No results'}</div>`; return; }
+  _renderAdminPanels(pending);
+  _renderAdminRows();
+}
+
+function _renderAdminPanels(pending){
+  const el=document.getElementById('adminPanels'); if(!el) return;
+  const ar=currentLang==='ar';
+  let html='';
+  if(pending && pending.length){
+    html += `<div class="admin-panel"><div class="admin-panel-t">${ar?'بانتظار تأكيد الدفع':'Awaiting payment confirmation'}</div>`;
+    html += pending.map(l=>{
+      const pl=(PLANS||[]).find(p=>p.id===l.plan); const pn=pl?(pl.name[ar?'ar':'en']+' · '+pl.price+' AED'):(l.plan||'');
+      return `<div class="am-row">
+        <div class="am-info"><div class="am-name">${escapeHtml(l.brand)} ${escapeHtml(l.model||'')}</div>
+        <div class="am-sub">${escapeHtml(l.userName||'')} · ${escapeHtml(pn)}</div></div>
+        <button class="am-tg on" onclick="adminApprove('${l.id}')">✓ ${ar?'تأكيد ونشر':'Approve'}</button>
+      </div>`;
+    }).join('') + `</div>`;
+  }
+  const plans = (PLANS && PLANS.length) ? PLANS : [];
+  if(plans.length){
+    html += `<div class="admin-panel"><div class="admin-panel-t">${ar?'الباقات والأسعار':'Plans & pricing'}</div>`;
+    html += plans.map(p=>`<div class="plan-edit">
+      <div class="plan-edit-name">${p.name[ar?'ar':'en']}</div>
+      <label>${ar?'السعر':'Price'}<input type="number" step="0.01" value="${p.price}" id="pe_price_${p.id}"></label>
+      <label>${ar?'أيام':'Days'}<input type="number" value="${p.days}" id="pe_days_${p.id}"></label>
+      <label>${ar?'أيام التميّز':'Feat.'}<input type="number" value="${p.featured}" id="pe_feat_${p.id}"></label>
+      <label>${ar?'تحديثات':'Refresh'}<input type="number" value="${p.refreshes}" id="pe_ref_${p.id}"></label>
+      <label class="plan-edit-chk"><input type="checkbox" id="pe_rec_${p.id}" ${p.recommended?'checked':''}> ${ar?'موصى':'Rec'}</label>
+      <button class="am-tg" onclick="adminSavePlan('${p.id}')">${ar?'حفظ':'Save'}</button>
+    </div>`).join('') + `</div>`;
+  } else {
+    html += `<div class="admin-panel"><div class="admin-panel-t">${ar?'الباقات':'Plans'}</div><div style="font-size:.78rem;color:var(--grey);padding:.4rem">${ar?'شغّل AUREX_add_plans.sql لإدارة الأسعار هنا':'Run AUREX_add_plans.sql to manage pricing here'}</div></div>`;
+  }
+  el.innerHTML = html;
+}
+
+function filterAdminList(){ _renderAdminRows(); }
+function _renderAdminRows(){
+  const wrap=document.getElementById('adminList'); if(!wrap) return;
+  const ar=currentLang==='ar';
+  const q=(document.getElementById('adminSearch')?.value||'').trim().toLowerCase();
+  let rows=listings.slice();
+  if(q) rows=rows.filter(l=>((l.brand||'')+' '+(l.model||'')+' '+(l.title||'')+' '+(l.userName||'')).toLowerCase().includes(q));
+  if(!rows.length){ wrap.innerHTML=`<div class="admin-empty">${ar?'لا توجد نتائج':'No results'}</div>`; return; }
   wrap.innerHTML = rows.map(l=>{
     const price = l.price ? Number(l.price).toLocaleString(ar?'ar-AE':'en-AE')+' AED' : (ar?'تفاوضي':'Negotiable');
     const thumb = (l.images && l.images[0]) ? `<img src="${escapeHtml(l.images[0])}" alt="" loading="lazy">` : `<span class="am-ph">◷</span>`;
-    const sold = l.status==='sold' ? `<span class="am-sold">${ar?'مُباع':'Sold'}</span>` : '';
+    let tags='';
+    if(l.status==='sold') tags+=`<span class="am-sold">${ar?'مُباع':'Sold'}</span>`;
+    if(l.planStatus==='pending') tags+=`<span class="am-sold" style="color:#e0a64b;border-color:#e0a64b">${ar?'بانتظار الدفع':'Pending'}</span>`;
+    if(isExpired(l)) tags+=`<span class="am-sold">${ar?'منتهٍ':'Expired'}</span>`;
     const featBtn = isFeatured(l)
       ? `<button class="am-tg on" onclick="adminUnfeature('${l.id}')">★ ${ar?'مميّز':'Featured'}</button>`
       : `<button class="am-tg" onclick="adminSetFeatured('${l.id}',30)">★ ${ar?'تمييز':'Feature'}</button>`;
@@ -198,12 +257,48 @@ function renderAdmin(){
     return `<div class="am-row">
       <div class="am-thumb" onclick="openDetail('${l.id}')">${thumb}</div>
       <div class="am-info" onclick="openDetail('${l.id}')">
-        <div class="am-name">${escapeHtml(l.brand)} ${escapeHtml(l.model||'')}${sold}</div>
+        <div class="am-name">${escapeHtml(l.brand)} ${escapeHtml(l.model||'')}${tags}</div>
         <div class="am-sub">${escapeHtml(l.userName||(ar?'بائع':'Seller'))} · ${price}</div>
       </div>
       <div class="am-actions">${featBtn}${verBtn}</div>
     </div>`;
   }).join('');
+}
+
+// Approve a paid listing: mark active, set the plan duration, apply featured days.
+async function adminApprove(id){
+  if(!isAdmin()) return;
+  const l = listings.find(x=>x.id===id); if(!l) return;
+  const plan = (PLANS||[]).find(p=>p.id===l.plan) || { days:30, featured:0 };
+  const { error } = await sb.from('listings').update({
+    plan_status:'active',
+    expires_at:new Date(Date.now()+(plan.days||30)*86400000).toISOString(),
+    bumped_at:new Date().toISOString()
+  }).eq('id', id);
+  if(error){ toast('Error: '+error.message); return; }
+  if((plan.featured||0) > 0){
+    await sb.from('featured_listings').upsert({ listing_id:id, until:new Date(Date.now()+plan.featured*86400000).toISOString() }, { onConflict:'listing_id' });
+  }
+  await loadListings(true);
+  toast(currentLang==='ar'?'تم التأكيد والنشر ✦':'Approved & published ✦');
+  renderAdmin();
+}
+
+// Save a plan's price/features (admin only).
+async function adminSavePlan(id){
+  if(!isAdmin()) return;
+  const num = el => { const e=document.getElementById(el); return e ? (parseFloat(e.value)||0) : 0; };
+  const { error } = await sb.from('plans').update({
+    price: num('pe_price_'+id),
+    days: Math.round(num('pe_days_'+id)),
+    featured_days: Math.round(num('pe_feat_'+id)),
+    refreshes: Math.round(num('pe_ref_'+id)),
+    recommended: !!(document.getElementById('pe_rec_'+id)||{}).checked
+  }).eq('id', id);
+  if(error){ toast('Error: '+error.message); return; }
+  await loadListings(true);
+  toast(currentLang==='ar'?'تم حفظ الباقة ✦':'Plan saved ✦');
+  renderAdmin();
 }
 
 // Switch the home content tab (Latest / Top Dealers / Brands / Verified)
@@ -217,7 +312,7 @@ function renderTopDealers(){
   const wrap = document.getElementById('topDealers');
   if(!wrap) return;
   const map = {};
-  listings.filter(l=>l.status==='available' && l.userId).forEach(l=>{
+  listings.filter(l=>isLive(l) && l.userId).forEach(l=>{
     if(!map[l.userId]) map[l.userId] = { id:l.userId, name:l.userName||(currentLang==='ar'?'بائع':'Seller'), avatar:l.sellerAvatar||'', count:0, verified:false };
     map[l.userId].count++;
     if(l.verified) map[l.userId].verified = true;
@@ -246,7 +341,7 @@ function renderDealer(){
   const mine = listings.filter(l=>l.userId===currentDealerId);
   if(!mine.length){ head.innerHTML=''; grid.innerHTML=`<div style="grid-column:1/-1;text-align:center;padding:3rem;color:var(--grey)">${currentLang==='ar'?'لا توجد إعلانات':'No listings'}</div>`; return; }
   const ref = mine[0];
-  const avail = mine.filter(l=>l.status==='available');
+  const avail = mine.filter(isLive);
   const name = ref.userName || (currentLang==='ar'?'بائع':'Seller');
   const av = ref.sellerAvatar ? `<img src="${escapeHtml(ref.sellerAvatar)}" alt="">` : escapeHtml(name.charAt(0).toUpperCase());
   head.innerHTML = `
@@ -277,6 +372,7 @@ function filterListings(){
   const search = document.getElementById('globalSearch')?.value?.toLowerCase()||'';
 
   let results = listings.filter(l=>{
+    if(isExpired(l)) return false;
     if(brand && l.brand!==brand) return false;
     if(cond && canonCond(l.condition)!==cond) return false;
     if(set && canonSet(l.set)!==set) return false;

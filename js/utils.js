@@ -37,6 +37,9 @@ const SET_AR  = {'Full Set':'فل سيت','Box Only':'بوكس فقط','Papers O
 // A listing is "featured" (paid placement) when it has an active row in featured_listings
 // (computed at load in loadListings). Sellers cannot set this — only the owner can, via Supabase.
 function isFeatured(l){ return !!(l && l.featured); }
+// A listing is expired once its plan duration (expires_at) has passed; live = available & not expired.
+function isExpired(l){ return !!(l && l.expiresAt && Date.parse(l.expiresAt) < Date.now()); }
+function isLive(l){ return !!(l && l.status==='available' && !isExpired(l)); }
 function canonCond(v){ return COND_CANON[v] || v || ''; }
 function canonSet(v){ return SET_CANON[v] || v || ''; }
 function tCond(v){ const c=canonCond(v); return currentLang==='ar' ? (COND_AR[c]||c) : c; }

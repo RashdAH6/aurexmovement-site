@@ -290,6 +290,15 @@ html[dir="rtl"] .feat-badge{left:auto;right:.7rem}
 .am-tg.on{background:var(--gold);border-color:var(--gold);color:var(--bg)}
 .am-sold{font-size:.55rem;color:var(--grey);border:1px solid var(--border);padding:.05rem .35rem;margin-inline-start:.5rem;text-transform:uppercase;letter-spacing:.1em}
 .admin-empty{background:var(--bg2);padding:3rem;text-align:center;color:var(--grey);font-size:.85rem}
+.admin-panel{background:var(--bg2);border:1px solid var(--border);border-radius:6px;padding:1rem;margin-bottom:1rem}
+.admin-panel-t{font-size:.62rem;letter-spacing:.18em;text-transform:uppercase;color:var(--gold);margin-bottom:.8rem}
+.plan-edit{display:flex;align-items:flex-end;gap:.6rem;flex-wrap:wrap;padding:.6rem 0;border-bottom:1px solid var(--border)}
+.plan-edit:last-child{border-bottom:none}
+.plan-edit-name{font-size:.85rem;color:var(--white);min-width:78px;font-family:var(--serif)}
+.plan-edit label{display:flex;flex-direction:column;font-size:.55rem;letter-spacing:.1em;text-transform:uppercase;color:var(--grey);gap:.2rem}
+.plan-edit label input[type=number]{width:62px;background:var(--bg);border:1px solid var(--border);color:var(--white);padding:.35rem .4rem;font-size:.8rem;outline:none;font-family:inherit}
+.plan-edit label input[type=number]:focus{border-color:var(--gold)}
+.plan-edit-chk{flex-direction:row !important;align-items:center;gap:.3rem !important}
 @media(max-width:640px){.am-actions{flex-direction:column}.am-row{flex-wrap:wrap}.admin-search{width:100%}}
 /* ═══ Dealer storefront + avatar images ═══ */
 .dealer-page{max-width:1100px;margin:0 auto;padding:30px 4vw 60px}

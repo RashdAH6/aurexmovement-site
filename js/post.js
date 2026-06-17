@@ -85,7 +85,8 @@ function selectPlan(id){ selectedPlan = id; renderPlanPicker(); }
 function renderPlanPicker(){
   const wrap=document.getElementById('planGrid'); if(!wrap) return;
   const ar=currentLang==='ar';
-  wrap.innerHTML = AUREX_PLANS.map(p=>{
+  const plans = (typeof PLANS!=='undefined' && PLANS && PLANS.length) ? PLANS : AUREX_PLANS;
+  wrap.innerHTML = plans.map(p=>{
     const price = p.price===0 ? (ar?'مجاني':'FREE') : p.price.toFixed(2)+' AED';
     const was = p.was ? `<span class="plan-was">${p.was.toFixed(2)} AED</span>` : '';
     const feats = [
@@ -212,7 +213,7 @@ async function submitListing(){
       dial_color: document.getElementById('pDial').value.trim(),
       condition: cond,
       box_papers: document.getElementById('pSet').value,
-      description: (function(){ var d=document.getElementById('pDesc').value.trim(); var w=document.getElementById('pWarranty'); if(!editingListingId && w && w.value==='yes'){ d=(d?d+'\n':'')+(currentLang==='ar'?'✓ يوجد ضمان':'✓ Warranty included'); } return d; })(),
+      description: document.getElementById('pDesc').value.trim(),
       price: price||null,
       negotiable: document.getElementById('pNeg').value==='yes',
       whatsapp: wa,
@@ -222,6 +223,7 @@ async function submitListing(){
       case_size: document.getElementById('pSize').value ? parseInt(document.getElementById('pSize').value) : null,
       gender: document.getElementById('pGender').value,
       bracelet: document.getElementById('pBracelet').value,
+      warranty: (document.getElementById('pWarranty')||{}).value === 'yes',
       images: imageUrls,
     };
 
@@ -229,11 +231,18 @@ async function submitListing(){
     if(editingListingId){
       ({ error } = await sb.from('listings').update(payload).eq('id', editingListingId).eq('user_id', currentUser.id));
     } else {
+      const _plans = (typeof PLANS!=='undefined' && PLANS && PLANS.length) ? PLANS : (typeof AUREX_PLANS!=='undefined' ? AUREX_PLANS : []);
+      const _plan = _plans.find(p=>p.id===selectedPlan) || _plans[0] || {id:'free',price:0,days:7,refreshes:0};
+      const _free = (Number(_plan.price)||0) === 0;
       ({ error } = await sb.from('listings').insert([{
         ...payload,
         user_id: String(currentUser.id),
         user_name: currentUser.name,
         status: 'available',
+        plan: _plan.id,
+        plan_status: _free ? 'active' : 'pending',
+        expires_at: new Date(Date.now() + (_plan.days||7)*86400000).toISOString(),
+        refreshes_left: _plan.refreshes||0,
       }]));
     }
     if(error) throw error;
