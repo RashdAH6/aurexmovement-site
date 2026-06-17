@@ -121,7 +121,7 @@ async function uploadAvatar(input){
   toast(currentLang==='ar'?'جاري رفع الصورة...':'Uploading photo...');
   try {
     const ext = (file.name.split('.').pop()||'jpg').toLowerCase().replace(/[^a-z0-9]/g,'') || 'jpg';
-    const path = `avatars/${currentUser.id}_${Date.now()}.${ext}`;
+    const path = `${currentUser.id}/avatar_${Date.now()}.${ext}`;
     const { error: upErr } = await sb.storage.from('listing-images').upload(path, file, { contentType:file.type, upsert:true });
     if(upErr) throw upErr;
     const url = sb.storage.from('listing-images').getPublicUrl(path).data.publicUrl;
