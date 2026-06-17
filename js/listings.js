@@ -189,12 +189,14 @@ function renderAdmin(){
   const featCount = listings.filter(l=>isFeatured(l)).length;
   const pending = listings.filter(l=>l.planStatus==='pending');
   const verDealers = new Set(listings.filter(l=>l.verified && l.userId).map(l=>l.userId)).size;
+  const userCount = new Set(listings.filter(l=>l.userId).map(l=>l.userId)).size;
   const m = document.getElementById('adminMetrics');
   if(m) m.innerHTML = [
     [ar?'إعلانات حيّة':'Live', live],
     [ar?'مميّزة':'Featured', featCount],
     [ar?'بانتظار الدفع':'Pending', pending.length],
-    [ar?'تجار موثّقون':'Verified', verDealers]
+    [ar?'تجار موثّقون':'Verified', verDealers],
+    [ar?'المستخدمون':'Users', userCount]
   ].map(x=>`<div class="admin-metric"><div class="am-lbl">${x[0]}</div><div class="am-num">${x[1]}</div></div>`).join('');
   _renderAdminPanels(pending);
   _renderAdminRows();
@@ -230,6 +232,28 @@ function _renderAdminPanels(pending){
   } else {
     html += `<div class="admin-panel"><div class="admin-panel-t">${ar?'الباقات':'Plans'}</div><div style="font-size:.78rem;color:var(--grey);padding:.4rem">${ar?'شغّل AUREX_add_plans.sql لإدارة الأسعار هنا':'Run AUREX_add_plans.sql to manage pricing here'}</div></div>`;
   }
+  // Users panel — every seller, with verify + jump-to-their-ads.
+  const umap={};
+  listings.forEach(l=>{ if(!l.userId) return; if(!umap[l.userId]) umap[l.userId]={id:l.userId,name:l.userName||(ar?'بائع':'Seller'),avatar:l.sellerAvatar||'',count:0,live:0,verified:false}; const u=umap[l.userId]; u.count++; if(isLive(l))u.live++; if(l.verified)u.verified=true; if(!u.avatar&&l.sellerAvatar)u.avatar=l.sellerAvatar; });
+  const users=Object.values(umap).sort((a,b)=>b.count-a.count);
+  if(users.length){
+    html += `<div class="admin-panel"><div class="admin-panel-t">${ar?'المستخدمون':'Users'} (${users.length})</div>`;
+    html += users.map(u=>{
+      const safeName=String(u.name||'').replace(/['"\\<>]/g,' ').trim();
+      const av=u.avatar?`<img src="${escapeHtml(u.avatar)}" alt="">`:`<span class="am-ph">${escapeHtml((u.name||'?').charAt(0))}</span>`;
+      const verBtn=u.verified
+        ? `<button class="am-tg on" onclick="adminUnverifySeller('${u.id}')">✓ ${ar?'موثّق':'Verified'}</button>`
+        : `<button class="am-tg" onclick="adminVerifySeller('${u.id}')">✓ ${ar?'توثيق':'Verify'}</button>`;
+      return `<div class="am-row">
+        <div class="am-thumb">${av}</div>
+        <div class="am-info" onclick="adminViewUserAds('${safeName}')">
+          <div class="am-name">${escapeHtml(u.name)}${u.verified?` <span class="am-sold" style="color:#3f7a52;border-color:#3f7a52">${ar?'موثّق':'Verified'}</span>`:''}</div>
+          <div class="am-sub">${u.live}/${u.count} ${ar?'إعلان حيّ':'live'}</div>
+        </div>
+        <div class="am-actions">${verBtn}<button class="am-tg" onclick="adminViewUserAds('${safeName}')">${ar?'إعلاناته':'Ads'}</button></div>
+      </div>`;
+    }).join('') + `</div>`;
+  }
   el.innerHTML = html;
 }
 
@@ -248,19 +272,24 @@ function _renderAdminRows(){
     if(l.status==='sold') tags+=`<span class="am-sold">${ar?'مُباع':'Sold'}</span>`;
     if(l.planStatus==='pending') tags+=`<span class="am-sold" style="color:#e0a64b;border-color:#e0a64b">${ar?'بانتظار الدفع':'Pending'}</span>`;
     if(isExpired(l)) tags+=`<span class="am-sold">${ar?'منتهٍ':'Expired'}</span>`;
+    if(l.status==='hidden') tags+=`<span class="am-sold">${ar?'مخفي':'Hidden'}</span>`;
     const featBtn = isFeatured(l)
       ? `<button class="am-tg on" onclick="adminUnfeature('${l.id}')">★ ${ar?'مميّز':'Featured'}</button>`
       : `<button class="am-tg" onclick="adminSetFeatured('${l.id}',30)">★ ${ar?'تمييز':'Feature'}</button>`;
     const verBtn = l.userId ? (l.verified
       ? `<button class="am-tg on" onclick="adminUnverifySeller('${l.userId}')">✓ ${ar?'موثّق':'Verified'}</button>`
       : `<button class="am-tg" onclick="adminVerifySeller('${l.userId}')">✓ ${ar?'توثيق':'Verify'}</button>`) : '';
+    const hideBtn = l.status==='hidden'
+      ? `<button class="am-tg" onclick="adminSetHidden('${l.id}',false)">${ar?'تفعيل':'Activate'}</button>`
+      : `<button class="am-tg" onclick="adminSetHidden('${l.id}',true)">${ar?'إخفاء':'Hide'}</button>`;
+    const delBtn = `<button class="am-tg am-del" onclick="adminDeleteListing('${l.id}')">${ar?'حذف':'Delete'}</button>`;
     return `<div class="am-row">
       <div class="am-thumb" onclick="openDetail('${l.id}')">${thumb}</div>
       <div class="am-info" onclick="openDetail('${l.id}')">
         <div class="am-name">${escapeHtml(l.brand)} ${escapeHtml(l.model||'')}${tags}</div>
         <div class="am-sub">${escapeHtml(l.userName||(ar?'بائع':'Seller'))} · ${price}</div>
       </div>
-      <div class="am-actions">${featBtn}${verBtn}</div>
+      <div class="am-actions">${hideBtn}${featBtn}${verBtn}${delBtn}</div>
     </div>`;
   }).join('');
 }
@@ -299,6 +328,33 @@ async function adminSavePlan(id){
   await loadListings(true);
   toast(currentLang==='ar'?'تم حفظ الباقة ✦':'Plan saved ✦');
   renderAdmin();
+}
+
+// ── Admin moderation: hide/activate + delete any listing (needs the admin RLS policies) ──
+async function adminSetHidden(id, hide){
+  if(!isAdmin()) return;
+  const ar=currentLang==='ar';
+  const { error } = await sb.from('listings').update({ status: hide?'hidden':'available' }).eq('id', id);
+  if(error){ toast('Error: '+error.message); return; }
+  await loadListings(true);
+  toast(hide ? (ar?'تم إخفاء الإعلان':'Listing hidden') : (ar?'تم تفعيل الإعلان':'Listing activated'));
+  renderAdmin();
+}
+async function adminDeleteListing(id){
+  if(!isAdmin()) return;
+  const ar=currentLang==='ar';
+  if(!confirm(ar?'حذف هذا الإعلان نهائياً؟ لا يمكن التراجع.':'Permanently delete this listing? This cannot be undone.')) return;
+  const { error } = await sb.from('listings').delete().eq('id', id);
+  if(error){ toast('Error: '+error.message); return; }
+  await loadListings(true);
+  toast(ar?'تم حذف الإعلان':'Listing deleted');
+  renderAdmin();
+}
+// Filter the admin list to one user's ads.
+function adminViewUserAds(name){
+  const s=document.getElementById('adminSearch'); if(s) s.value=name;
+  if(typeof filterAdminList==='function') filterAdminList();
+  document.getElementById('adminList')?.scrollIntoView({behavior:'smooth', block:'start'});
 }
 
 // Switch the home content tab (Latest / Top Dealers / Brands / Verified)
@@ -374,6 +430,7 @@ function filterListings(){
 
   let results = listings.filter(l=>{
     if(isExpired(l)) return false;
+    if(l.status==='hidden') return false;   // admin-deactivated listings stay out of the market
     if(brand && l.brand!==brand) return false;
     if(cond && canonCond(l.condition)!==cond) return false;
     if(set && canonSet(l.set)!==set) return false;
