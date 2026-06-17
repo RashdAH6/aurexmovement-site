@@ -109,7 +109,12 @@ img{max-width:100%;object-fit:cover}
 
 /* ═══ VIEWS ═══ */
 .view{display:none}
-.view.active{display:block}
+/* Page transition: each view fades + rises gently when it becomes active. */
+.view.active{display:block;animation:viewIn .42s cubic-bezier(.22,.61,.36,1) both}
+@keyframes viewIn{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
+@media (prefers-reduced-motion:reduce){
+  .view.active,.home-panel.panel-active{animation:none!important}
+}
 
 /* ═══ HERO ═══ */
 #hero-section{
@@ -1075,7 +1080,8 @@ html[dir="rtl"] .feat-badge{left:auto;right:.7rem}
 .home-tab.active{color:var(--gold)}
 .home-tab.active::after{content:'';position:absolute;left:1.1rem;right:1.1rem;bottom:-1px;height:2px;background:var(--gold)}
 .home-panel{display:none}
-.home-panel.panel-active{display:block}
+.home-panel.panel-active{display:block;animation:panelIn .3s ease both}
+@keyframes panelIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
 /* Desktop (>=901px) the sub-nav menu bar owns browse, so hide the duplicate home-tabs row.
    Below 901px the sub-nav is hidden and the home-tabs are the browse path — keep them. */
 @media(min-width:901px){ .home-tabs{display:none} }
