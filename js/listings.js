@@ -15,9 +15,14 @@ async function loadListings(force = false){
   const now = Date.now();
   if(!force && listings.length > 0 && (now - _listingsCacheTime) < LISTINGS_TTL) return;
   try {
-    const { data, error } = await sb.from('listings').select('*').order('created_at', { ascending: false }).limit(500);
-    if(error) throw error;
-    listings = (data||[]).map(l=>({
+    const [listRes, featRes] = await Promise.all([
+      sb.from('listings').select('*').order('created_at', { ascending: false }).limit(500),
+      sb.from('featured_listings').select('listing_id,until')  // may not exist yet — handled gracefully
+    ]);
+    if(listRes.error) throw listRes.error;
+    const featMap = {};
+    (featRes.data||[]).forEach(f=>{ if(!f.until || Date.parse(f.until) > now) featMap[f.listing_id] = true; });
+    listings = (listRes.data||[]).map(l=>({
       id: l.id,
       userId: l.user_id,
       userName: l.user_name,
@@ -43,6 +48,7 @@ async function loadListings(force = false){
       status: l.status,
       verified: l.seller_verified === true,
       createdAt: new Date(l.created_at).getTime(),
+      featured: !!featMap[l.id],
     }));
     _listingsCacheTime = now;
   } catch(e) {
@@ -75,10 +81,11 @@ function renderCard(l, mini=false){
     : `<span class="wcard-badge badge-sold">${L.sold}</span>`;
   const isNew = (Date.now()-l.createdAt)<86400000 && l.status==='available'
     ? `<span class="wcard-featured">${L.newBadge}</span>` : '';
+  const feat = isFeatured(l) ? `<span class="feat-badge">★ ${currentLang==='ar'?'مميّز':'Featured'}</span>` : '';
   const priceDisplay = l.price ? Number(l.price).toLocaleString(locale)+' AED' : (currentLang==='ar'?'تفاوضي':'Negotiable');
   return `
-  <div class="wcard" onclick="openDetail('${l.id}')">
-    <div class="wcard-img">${isNew}${badge}${favBtnHtml(l.id)}${imgHtml}</div>
+  <div class="wcard${isFeatured(l)?' wcard-feat':''}" onclick="openDetail('${l.id}')">
+    <div class="wcard-img">${feat}${isNew}${badge}${favBtnHtml(l.id)}${imgHtml}</div>
     <div class="wcard-body">
       <div class="wcard-brand">${escapeHtml(l.brand)}${l.verified?` <span class="verified-mini" title="${currentLang==='ar'?'تاجر موثق':'Verified'}"><svg viewBox="0 0 24 24" width="11" height="11" fill="currentColor"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg></span>`:''}</div>
       <div class="wcard-model">${escapeHtml(l.title || l.model)}</div>
@@ -91,7 +98,7 @@ function renderHomeGrid(){
   const grid = document.getElementById('homeGrid');
   const empty = document.getElementById('homeEmpty');
   if(!grid) return;
-  const recent = [...listings].filter(l=>l.status==='available').sort((a,b)=>b.createdAt-a.createdAt).slice(0,6);
+  const recent = [...listings].filter(l=>l.status==='available').sort((a,b)=> ((isFeatured(b)?1:0)-(isFeatured(a)?1:0)) || (b.createdAt-a.createdAt)).slice(0,6);
   if(recent.length===0){ grid.style.display='none'; empty.style.display='block'; }
   else { grid.style.display='grid'; empty.style.display='none'; grid.innerHTML=recent.map(l=>renderCard(l)).join(''); }
   renderTopDealers();
@@ -193,9 +200,11 @@ function filterListings(){
     return true;
   });
 
-  if(sort==='price_asc') results.sort((a,b)=>Number(a.price||0)-Number(b.price||0));
-  else if(sort==='price_desc') results.sort((a,b)=>Number(b.price||0)-Number(a.price||0));
-  else results.sort((a,b)=>b.createdAt-a.createdAt);
+  const _bySort = (a,b)=> sort==='price_asc' ? Number(a.price||0)-Number(b.price||0)
+    : sort==='price_desc' ? Number(b.price||0)-Number(a.price||0)
+    : b.createdAt-a.createdAt;
+  // Featured (paid) listings are always pinned first, then the chosen sort within each group.
+  results.sort((a,b)=> ((isFeatured(b)?1:0)-(isFeatured(a)?1:0)) || _bySort(a,b));
 
   const grid = document.getElementById('listingsGrid');
   const empty = document.getElementById('listingsEmpty');

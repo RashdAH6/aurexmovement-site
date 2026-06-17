@@ -59,7 +59,7 @@ function openDetail(id, skipHash){
       ${thumbs?`<div class="detail-thumbs">${thumbs}</div>`:''}
     </div>
     <div class="detail-info">
-      <div class="detail-brand">${escapeHtml(l.brand)}</div>
+      <div class="detail-brand">${escapeHtml(l.brand)}${isFeatured(l)?` <span class="feat-badge" style="position:static;display:inline-block;margin-inline-start:.5rem;vertical-align:middle">★ ${currentLang==='ar'?'مميّز':'Featured'}</span>`:''}</div>
       <h1 class="detail-model">${escapeHtml(l.model)}</h1>
       <p class="detail-sub">${escapeHtml([l.ref,l.year,l.dial].filter(Boolean).join(' · '))}</p>
       <div class="detail-price-box">

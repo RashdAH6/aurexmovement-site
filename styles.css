@@ -251,6 +251,15 @@ img{max-width:100%;object-fit:cover}
   font-size:.55rem;letter-spacing:.15em;text-transform:uppercase;
   background:var(--gold);color:var(--bg);padding:.2rem .55rem;font-weight:700;
 }
+/* Featured (paid placement) badge + card glow */
+.feat-badge{
+  position:absolute;bottom:.7rem;left:.7rem;z-index:2;
+  background:linear-gradient(90deg,#c9a15b,#e6c77e);color:#0a0a0a;
+  font-size:.55rem;font-weight:800;letter-spacing:.1em;text-transform:uppercase;
+  padding:.25rem .55rem;border-radius:2px;box-shadow:0 2px 8px rgba(0,0,0,.45);
+}
+html[dir="rtl"] .feat-badge{left:auto;right:.7rem}
+.wcard-feat{box-shadow:0 0 0 1.5px var(--gold), 0 8px 30px rgba(201,161,91,.18)}
 .wcard-body{padding:.9rem .95rem 1rem}
 .wcard-brand{font-size:.55rem;letter-spacing:.2em;text-transform:uppercase;color:var(--gold);margin-bottom:.25rem}
 .wcard-model{font-family:var(--serif);font-size:1rem;color:var(--white);line-height:1.3;margin-bottom:.4rem;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;min-height:2.6em}

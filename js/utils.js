@@ -34,6 +34,9 @@ const COND_CANON = {'جديدة':'New','New':'New','شبه جديدة':'Like New
 const SET_CANON  = {'Full Set (بوكس + أوراق)':'Full Set','Full Set':'Full Set','بوكس فقط':'Box Only','Box Only':'Box Only','أوراق فقط':'Papers Only','Papers Only':'Papers Only','بدون بوكس أو أوراق':'No Box','بدون بوكس':'No Box','No Box':'No Box'};
 const COND_AR = {'New':'جديدة','Like New':'شبه جديدة','Excellent':'ممتازة','Good':'جيدة'};
 const SET_AR  = {'Full Set':'فل سيت','Box Only':'بوكس فقط','Papers Only':'أوراق فقط','No Box':'بدون بوكس'};
+// A listing is "featured" (paid placement) when it has an active row in featured_listings
+// (computed at load in loadListings). Sellers cannot set this — only the owner can, via Supabase.
+function isFeatured(l){ return !!(l && l.featured); }
 function canonCond(v){ return COND_CANON[v] || v || ''; }
 function canonSet(v){ return SET_CANON[v] || v || ''; }
 function tCond(v){ const c=canonCond(v); return currentLang==='ar' ? (COND_AR[c]||c) : c; }
