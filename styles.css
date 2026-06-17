@@ -698,7 +698,9 @@ html[dir="rtl"] .feat-badge{left:auto;right:.7rem}
 .success-text{font-size:.85rem;color:var(--grey);line-height:1.8;max-width:400px;margin:0 auto 2rem}
 
 /* ═══ MY ADS PAGE ═══ */
-#myads-page{padding:90px 0 60px}
+#myads-page,#favorites-page{padding:90px 0 60px}
+/* In the Aurex app (RN WebView) Google OAuth is blocked by Google — hide those buttons there. */
+body.in-app .btn-google,body.in-app .auth-divider{display:none!important}
 .myads-inner{max-width:900px;margin:0 auto;padding:2rem 4vw}
 .myads-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:2rem;flex-wrap:wrap;gap:1rem}
 .myads-title{font-family:var(--serif);font-size:1.8rem;color:var(--white)}

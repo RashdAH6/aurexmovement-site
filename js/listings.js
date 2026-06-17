@@ -401,7 +401,7 @@ function filterListings(){
       if(!sz || sz<sMin || sz>sMax) return false;
     }
     if(search){
-      const hay = (l.brand+' '+l.model+' '+l.ref+' '+l.desc).toLowerCase();
+      const hay = (l.brand+' '+(l.model||'')+' '+(l.title||'')+' '+(l.ref||'')+' '+(l.desc||'')).toLowerCase();
       if(!hay.includes(search)) return false;
     }
     return true;

@@ -428,8 +428,8 @@ function applyTranslations(){
   safeText('regPassLabel', currentLang==='ar'?'كلمة المرور':'Password');
   safeText('registerBtnEl', currentLang==='ar'?'إنشاء الحساب':'Create Account');
   safeHTML('regTermsNote', currentLang==='ar'
-    ?'بإنشاء حسابك، أنت توافق على <a href="/terms" target="_blank" rel="noopener" style="color:var(--gold);cursor:pointer;text-decoration:underline">الشروط والأحكام</a>'
-    :'By creating an account, you agree to our <a href="/terms" target="_blank" rel="noopener" style="color:var(--gold);cursor:pointer;text-decoration:underline">Terms & Conditions</a>');
+    ?'بإنشاء حسابك، أنت توافق على <a href="/terms" style="color:var(--gold);cursor:pointer;text-decoration:underline">الشروط والأحكام</a>'
+    :'By creating an account, you agree to our <a href="/terms" style="color:var(--gold);cursor:pointer;text-decoration:underline">Terms & Conditions</a>');
   safeHTML('registerSwitchText', currentLang==='ar'
     ?'لديك حساب؟ <a onclick="switchTab(\'login\')" id="switchToLogin">دخول</a>'
     :'Already have an account? <a onclick="switchTab(\'login\')" id="switchToLogin">Login</a>');
@@ -563,6 +563,8 @@ function applyTranslations(){
   // Post wizard
   safeText('postSecPlan', currentLang==='ar'?'اختر باقتك':'Choose your plan');
   safeText('lblWarranty', currentLang==='ar'?'الضمان':'Warranty');
+  const _pw=document.getElementById('pWarranty');
+  if(_pw && _pw.options.length>=2){ _pw.options[0].text=currentLang==='ar'?'بدون ضمان':'No Warranty'; _pw.options[1].text=currentLang==='ar'?'يوجد ضمان':'Has Warranty'; }
   safeText('wizBackBtn', currentLang==='ar'?'‹ رجوع':'‹ Back');
   safeText('wizNextBtn', currentLang==='ar'?'التالي ›':'Next ›');
   if(typeof currentView!=='undefined' && currentView==='post'){

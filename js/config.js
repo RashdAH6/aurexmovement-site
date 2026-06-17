@@ -5,6 +5,14 @@
 // Supabase client auto-processes and clears the URL — so login errors can be surfaced.
 window.__authReturn = (location.hash || '') + (location.search || '');
 
+// Running inside the Aurex native app? React Native WebView injects window.ReactNativeWebView.
+// Google OAuth is blocked by Google inside embedded WebViews, so we hide those buttons there
+// (CSS: body.in-app .btn-google) and rely on email/password.
+window.IS_IN_APP = !!window.ReactNativeWebView;
+if (window.IS_IN_APP) {
+  document.addEventListener('DOMContentLoaded', () => document.body.classList.add('in-app'));
+}
+
 // ════════════════════════════════════════════════
 // SUPABASE CONFIG
 // ════════════════════════════════════════════════
