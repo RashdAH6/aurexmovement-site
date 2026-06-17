@@ -86,7 +86,9 @@ function openDetail(id, skipHash){
       ${isAdmin()?`<div class="admin-bar"><span class="admin-lbl">${currentLang==='ar'?'إدارة':'Admin'}</span>${isFeatured(l)
         ? `<button class="admin-btn admin-on" onclick="adminUnfeature('${l.id}')">✓ ${currentLang==='ar'?'مميّز — إزالة':'Featured — Remove'}</button>`
         : `<button class="admin-btn" onclick="adminSetFeatured('${l.id}',30)">★ ${currentLang==='ar'?'تمييز 30 يوم':'Feature 30 days'}</button><button class="admin-btn" onclick="adminSetFeatured('${l.id}',0)">★ ${currentLang==='ar'?'تمييز دائم':'Feature — no expiry'}</button>`
-      }</div>`:''}
+      }${l.userId?(l.verified
+        ? `<button class="admin-btn admin-on" onclick="adminUnverifySeller('${l.userId}')">✓ ${currentLang==='ar'?'موثّق — إلغاء':'Verified — Unverify'}</button>`
+        : `<button class="admin-btn" onclick="adminVerifySeller('${l.userId}')">☆ ${currentLang==='ar'?'توثيق البائع':'Verify seller'}</button>`):''}</div>`:''}
       <div class="detail-specs">
         <h3 class="detail-specs-title">${currentLang==='ar'?'مواصفات الساعة':'Watch Specifications'}</h3>
         <div class="specs-grid">

@@ -15,13 +15,15 @@ async function loadListings(force = false){
   const now = Date.now();
   if(!force && listings.length > 0 && (now - _listingsCacheTime) < LISTINGS_TTL) return;
   try {
-    const [listRes, featRes] = await Promise.all([
+    const [listRes, featRes, verRes] = await Promise.all([
       sb.from('listings').select('*').order('created_at', { ascending: false }).limit(500),
-      sb.from('featured_listings').select('listing_id,until')  // may not exist yet — handled gracefully
+      sb.from('featured_listings').select('listing_id,until'),   // may not exist yet — handled gracefully
+      sb.from('verified_sellers').select('user_id')              // may not exist yet — handled gracefully
     ]);
     if(listRes.error) throw listRes.error;
     const featMap = {};
     (featRes.data||[]).forEach(f=>{ if(!f.until || Date.parse(f.until) > now) featMap[f.listing_id] = true; });
+    const verSet = new Set((verRes.data||[]).map(v=>v.user_id));
     listings = (listRes.data||[]).map(l=>({
       id: l.id,
       userId: l.user_id,
@@ -46,7 +48,7 @@ async function loadListings(force = false){
       bracelet: l.bracelet || '',
       images: l.images || [],
       status: l.status,
-      verified: l.seller_verified === true,
+      verified: verSet.has(l.user_id) || l.seller_verified === true,
       createdAt: new Date(l.created_at).getTime(),
       featured: !!featMap[l.id],
     }));
@@ -135,6 +137,25 @@ async function adminUnfeature(id){
   await loadListings(true);
   toast(currentLang==='ar' ? 'أُزيل التمييز' : 'Removed from featured');
   openDetail(id, true);
+}
+
+// ── Admin: verify / unverify a SELLER (per-seller; badge shows on ALL their listings) ──
+async function adminVerifySeller(userId){
+  if(!isAdmin() || !userId) return;
+  const name = (listings.find(l=>l.userId===userId)||{}).userName || null;
+  const { error } = await sb.from('verified_sellers').upsert({ user_id: userId, name }, { onConflict: 'user_id' });
+  if(error){ toast('Error: ' + error.message); return; }
+  await loadListings(true);
+  toast(currentLang==='ar' ? 'تم توثيق البائع ✦' : 'Seller verified ✦');
+  if(currentDetailId) openDetail(currentDetailId, true);
+}
+async function adminUnverifySeller(userId){
+  if(!isAdmin() || !userId) return;
+  const { error } = await sb.from('verified_sellers').delete().eq('user_id', userId);
+  if(error){ toast('Error: ' + error.message); return; }
+  await loadListings(true);
+  toast(currentLang==='ar' ? 'أُلغي التوثيق' : 'Verification removed');
+  if(currentDetailId) openDetail(currentDetailId, true);
 }
 
 // Switch the home content tab (Latest / Top Dealers / Brands / Verified)
