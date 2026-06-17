@@ -547,6 +547,12 @@ function applyTranslations(){
   safeText('footerHowLink', currentLang==='ar'?'كيف يعمل':'How It Works');
   safeText('footerTermsLink', L.footerTerms);
   safeText('footerPrivacyLink', L.footerPrivacy);
+  // Admin dashboard (admin only)
+  safeText('adminTitle', currentLang==='ar'?'لوحة الإدارة':'Admin dashboard');
+  safeText('dropMenuAdmin', currentLang==='ar'?'لوحة الإدارة':'Admin dashboard');
+  safeText('profileAdminLbl', currentLang==='ar'?'لوحة الإدارة':'Admin dashboard');
+  const _adminS = document.getElementById('adminSearch'); if(_adminS) _adminS.placeholder = currentLang==='ar'?'ابحث عن ساعة أو تاجر...':'Search watches or dealers...';
+  if(typeof currentView!=='undefined' && currentView==='admin' && typeof renderAdmin==='function') renderAdmin();
 
   // Post preview title
   safeText('postPreviewTitle', L.postPreviewTitle);

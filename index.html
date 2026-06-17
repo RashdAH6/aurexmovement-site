@@ -120,6 +120,10 @@
             <svg viewBox="0 0 24 24" stroke-width="1.5"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
             <span id="dropMenuSettings">الملف الشخصي</span>
           </button>
+          <button class="avatar-dropdown-item admin-only" data-disp="flex" style="display:none" onclick="closeAvatarMenu();showView('admin')">
+            <svg viewBox="0 0 24 24" stroke-width="1.5" fill="none"><polygon points="12 2 15 9 22 9.3 16.5 14 18.5 21 12 17 5.5 21 7.5 14 2 9.3 9 9"/></svg>
+            <span id="dropMenuAdmin">لوحة الإدارة</span>
+          </button>
           <button class="avatar-dropdown-item danger" onclick="closeAvatarMenu();logout()">
             <svg viewBox="0 0 24 24" stroke-width="1.5"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
             <span id="dropMenuLogout">تسجيل الخروج</span>
@@ -969,10 +973,25 @@
         <a class="profile-link" href="mailto:support@aurexmovement.com"><span id="profileContactLink">تواصل مع الدعم</span><span class="profile-chev">›</span></a>
       </div>
 
+      <!-- Admin dashboard (admin only) -->
+      <button class="admin-only" data-disp="block" id="profileAdminBtn" style="display:none;width:100%;background:transparent;border:1px solid var(--gold);color:var(--gold);padding:.9rem;font-size:.72rem;letter-spacing:.15em;text-transform:uppercase;cursor:pointer;font-family:var(--ar);margin-bottom:1.5px" onclick="showView('admin')">★ <span id="profileAdminLbl">لوحة الإدارة</span></button>
+
       <!-- Logout -->
       <button class="profile-logout" onclick="logout()" id="profileLogoutBtn">تسجيل الخروج</button>
 
     </div>
+  </div>
+</div>
+
+<!-- ═══ ADMIN DASHBOARD VIEW (admin only) ═══ -->
+<div class="view" id="view-admin">
+  <div class="admin-page">
+    <div class="admin-head">
+      <h1 class="admin-title" id="adminTitle">لوحة الإدارة</h1>
+      <input id="adminSearch" class="admin-search" placeholder="ابحث عن ساعة أو تاجر..." oninput="renderAdmin()">
+    </div>
+    <div class="admin-metrics" id="adminMetrics"></div>
+    <div id="adminList" class="admin-list"></div>
   </div>
 </div>
 

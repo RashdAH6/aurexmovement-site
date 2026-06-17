@@ -111,6 +111,7 @@ function updateNavForUser(){
     g.style.display='flex'; u.style.display='none';
     if(a) a.textContent='?';
   }
+  refreshAdminUI();
 }
 
 async function logout(){

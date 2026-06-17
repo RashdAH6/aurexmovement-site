@@ -128,7 +128,7 @@ async function adminSetFeatured(id, days){
   if(error){ toast('Error: ' + error.message); return; }
   await loadListings(true);
   toast(currentLang==='ar' ? 'تم التمييز ✦' : 'Featured ✦');
-  openDetail(id, true);
+  _adminAfter();
 }
 async function adminUnfeature(id){
   if(!isAdmin()) return;
@@ -136,7 +136,7 @@ async function adminUnfeature(id){
   if(error){ toast('Error: ' + error.message); return; }
   await loadListings(true);
   toast(currentLang==='ar' ? 'أُزيل التمييز' : 'Removed from featured');
-  openDetail(id, true);
+  _adminAfter();
 }
 
 // ── Admin: verify / unverify a SELLER (per-seller; badge shows on ALL their listings) ──
@@ -147,7 +147,7 @@ async function adminVerifySeller(userId){
   if(error){ toast('Error: ' + error.message); return; }
   await loadListings(true);
   toast(currentLang==='ar' ? 'تم توثيق البائع ✦' : 'Seller verified ✦');
-  if(currentDetailId) openDetail(currentDetailId, true);
+  _adminAfter();
 }
 async function adminUnverifySeller(userId){
   if(!isAdmin() || !userId) return;
@@ -155,7 +155,51 @@ async function adminUnverifySeller(userId){
   if(error){ toast('Error: ' + error.message); return; }
   await loadListings(true);
   toast(currentLang==='ar' ? 'أُلغي التوثيق' : 'Verification removed');
-  if(currentDetailId) openDetail(currentDetailId, true);
+  _adminAfter();
+}
+
+// After an admin action, refresh whatever admin surface is currently open.
+function _adminAfter(){
+  if(currentView==='admin') renderAdmin();
+  else if(currentDetailId) openDetail(currentDetailId, true);
+}
+
+// Admin dashboard: every listing as a row with one-click Feature / Verify toggles.
+function renderAdmin(){
+  const wrap = document.getElementById('adminList'); if(!wrap) return;
+  const ar = currentLang==='ar';
+  const q = (document.getElementById('adminSearch')?.value||'').trim().toLowerCase();
+  const live = listings.filter(l=>l.status==='available').length;
+  const featCount = listings.filter(l=>isFeatured(l)).length;
+  const verDealers = new Set(listings.filter(l=>l.verified && l.userId).map(l=>l.userId)).size;
+  const m = document.getElementById('adminMetrics');
+  if(m) m.innerHTML = [
+    [ar?'إعلانات متاحة':'Live watches', live],
+    [ar?'مميّزة':'Featured', featCount],
+    [ar?'تجار موثّقون':'Verified dealers', verDealers]
+  ].map(x=>`<div class="admin-metric"><div class="am-lbl">${x[0]}</div><div class="am-num">${x[1]}</div></div>`).join('');
+  let rows = listings.slice();
+  if(q) rows = rows.filter(l=>((l.brand||'')+' '+(l.model||'')+' '+(l.title||'')+' '+(l.userName||'')).toLowerCase().includes(q));
+  if(!rows.length){ wrap.innerHTML = `<div class="admin-empty">${ar?'لا توجد نتائج':'No results'}</div>`; return; }
+  wrap.innerHTML = rows.map(l=>{
+    const price = l.price ? Number(l.price).toLocaleString(ar?'ar-AE':'en-AE')+' AED' : (ar?'تفاوضي':'Negotiable');
+    const thumb = (l.images && l.images[0]) ? `<img src="${escapeHtml(l.images[0])}" alt="" loading="lazy">` : `<span class="am-ph">◷</span>`;
+    const sold = l.status==='sold' ? `<span class="am-sold">${ar?'مُباع':'Sold'}</span>` : '';
+    const featBtn = isFeatured(l)
+      ? `<button class="am-tg on" onclick="adminUnfeature('${l.id}')">★ ${ar?'مميّز':'Featured'}</button>`
+      : `<button class="am-tg" onclick="adminSetFeatured('${l.id}',30)">★ ${ar?'تمييز':'Feature'}</button>`;
+    const verBtn = l.userId ? (l.verified
+      ? `<button class="am-tg on" onclick="adminUnverifySeller('${l.userId}')">✓ ${ar?'موثّق':'Verified'}</button>`
+      : `<button class="am-tg" onclick="adminVerifySeller('${l.userId}')">✓ ${ar?'توثيق':'Verify'}</button>`) : '';
+    return `<div class="am-row">
+      <div class="am-thumb" onclick="openDetail('${l.id}')">${thumb}</div>
+      <div class="am-info" onclick="openDetail('${l.id}')">
+        <div class="am-name">${escapeHtml(l.brand)} ${escapeHtml(l.model||'')}${sold}</div>
+        <div class="am-sub">${escapeHtml(l.userName||(ar?'بائع':'Seller'))} · ${price}</div>
+      </div>
+      <div class="am-actions">${featBtn}${verBtn}</div>
+    </div>`;
+  }).join('');
 }
 
 // Switch the home content tab (Latest / Top Dealers / Brands / Verified)

@@ -11,6 +11,7 @@ async function showView(v){
   previousView = currentView;
   currentView = v;
   updateBottomNav();
+  refreshAdminUI();
   if(v!=='detail'){
     restoreMeta();
     if(location.hash.startsWith('#watch-')){
@@ -26,6 +27,7 @@ async function showView(v){
   if(v==='home'){ await loadListings(); renderHomeGrid(); updateStatCount(); }
   if(v==='post'){ editingListingId = null; resetPostForm(); }
   if(v==='profile'){ await loadListings(); loadProfile(); }
+  if(v==='admin'){ if(!isAdmin()) return showView('home'); await loadListings(); renderAdmin(); }
   if(v==='terms'){ renderTerms(); }
 }
 

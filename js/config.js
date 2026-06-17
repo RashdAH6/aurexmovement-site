@@ -12,6 +12,11 @@ const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 // on featured_listings (admin email only); this check just shows/hides the buttons.
 const ADMIN_EMAIL = 'rashed.alshamsi731@gmail.com';
 function isAdmin(){ return !!(currentUser && currentUser.email && currentUser.email.toLowerCase() === ADMIN_EMAIL.toLowerCase()); }
+// Show/hide elements tagged .admin-only depending on whether the current user is the admin.
+function refreshAdminUI(){
+  const show = isAdmin();
+  document.querySelectorAll('.admin-only').forEach(e=>{ e.style.display = show ? (e.getAttribute('data-disp') || 'block') : 'none'; });
+}
 
 // Early function definitions (needed before DOM ready)
 function toggleSettings(){
