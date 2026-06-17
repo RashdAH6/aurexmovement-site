@@ -54,7 +54,7 @@ async function signInWithGoogle(){
   try {
     const { error } = await sb.auth.signInWithOAuth({
       provider: 'google',
-      options: { redirectTo: window.location.origin }
+      options: { redirectTo: window.location.origin + '/' }
     });
     if(error) throw error;
     // browser now redirects to Google; session is set on return via onAuthStateChange
