@@ -6,7 +6,14 @@
 // ════════════════════════════════════════════════
 const SUPABASE_URL = 'https://udfpwakssijojlsuvqjm.supabase.co';
 const SUPABASE_KEY = 'sb_publishable_pheGlJPG-oM5oPJqQAI1kQ_gYX7lnc_';
-const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY, {
+  auth: {
+    flowType: 'implicit',        // token returned directly in the URL — robust for a static SPA
+    detectSessionInUrl: true,    // auto-read the OAuth token on return
+    persistSession: true,
+    autoRefreshToken: true,
+  },
+});
 
 // Admin (you) — gates the in-app "Feature" controls. The REAL security is the RLS policy
 // on featured_listings (admin email only); this check just shows/hides the buttons.
