@@ -47,6 +47,13 @@ async function init(){
   updateNavForUser();
   applyTheme(currentTheme);
   setLang(currentLang);
+  // Surface any OAuth login error returned in the URL (e.g. a Google sign-in failure),
+  // so it's visible instead of silently cleared.
+  try {
+    const ret = window.__authReturn || '';
+    const m = ret.match(/error_description=([^&]+)/) || ret.match(/[#&?]error=([^&]+)/);
+    if(m && !currentUser){ toast((currentLang==='ar'?'خطأ الدخول: ':'Login error: ') + decodeURIComponent(m[1].replace(/\+/g,' ')).slice(0,140)); }
+  } catch(e){}
   await loadListings();
   await loadFavorites();
   renderHomeGrid();

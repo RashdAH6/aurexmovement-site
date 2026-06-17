@@ -1,6 +1,10 @@
 // config.js — Supabase client, early UI toggles, and global state.
 // Part of the Aurex Movement app. Classic (non-module) script — load FIRST.
 
+// Capture any OAuth return params (#error / #access_token) synchronously, BEFORE the
+// Supabase client auto-processes and clears the URL — so login errors can be surfaced.
+window.__authReturn = (location.hash || '') + (location.search || '');
+
 // ════════════════════════════════════════════════
 // SUPABASE CONFIG
 // ════════════════════════════════════════════════
