@@ -25,25 +25,30 @@ function clearAuthError(){ document.getElementById('authError').classList.remove
 async function doRegister(){
   const name = document.getElementById('regName').value.trim();
   const email = document.getElementById('regEmail').value.trim();
-  const wa = document.getElementById('regWA').value.trim().replace(/\D/g,'');
   const pass = document.getElementById('regPass').value;
   if(!name){ showAuthError(currentLang==='ar'?'يرجى إدخال الاسم':'Please enter your name'); return; }
   if(!email||!email.includes('@')){ showAuthError(currentLang==='ar'?'يرجى إدخال إيميل صحيح':'Please enter a valid email'); return; }
-  if(wa.length < 7){ showAuthError(currentLang==='ar'?'يرجى إدخال رقم واتساب صحيح':'Please enter a valid WhatsApp number'); return; }
   if(pass.length < 6){ showAuthError(currentLang==='ar'?'كلمة المرور 6 أحرف على الأقل':'Password must be at least 6 characters'); return; }
 
   try {
     const {data, error} = await sb.auth.signUp({
       email, password: pass,
-      options: { data: { name, whatsapp: wa } }
+      options: { data: { name }, emailRedirectTo: window.location.origin + '/' }
     });
     if(error) throw error;
-    showAuthError(currentLang==='ar'
-      ?'✅ تم التسجيل! تحقق من إيميلك لتأكيد الحساب'
-      :'✅ Registered! Check your email to confirm your account');
-    document.getElementById('authError').style.background='rgba(39,174,96,.12)';
-    document.getElementById('authError').style.borderColor='rgba(39,174,96,.3)';
-    document.getElementById('authError').style.color='#4ecb71';
+    if(data.session){
+      // Email confirmation is off → the user is signed in immediately.
+      closeModal();
+      toast(currentLang==='ar'?'مرحباً بك في Aurex ✦':'Welcome to Aurex ✦');
+    } else {
+      // Confirmation required → a verification link has been emailed.
+      showAuthError(currentLang==='ar'
+        ?'✅ تم التسجيل! افتح الرابط في إيميلك لتفعيل حسابك'
+        :'✅ Registered! Open the link in your email to activate your account');
+      document.getElementById('authError').style.background='rgba(39,174,96,.12)';
+      document.getElementById('authError').style.borderColor='rgba(39,174,96,.3)';
+      document.getElementById('authError').style.color='#4ecb71';
+    }
   } catch(e){
     showAuthError(currentLang==='ar'?'خطأ: '+e.message:'Error: '+e.message);
   }
