@@ -548,7 +548,7 @@
           <div class="post-grid">
             <div class="post-field">
               <label id="lblBrand">الماركة <span>*</span></label>
-              <select class="post-select" id="pBrand" onchange="updatePreview()">
+              <select class="post-select" id="pBrand" onchange="onBrandChange();updatePreview()">
                 <option value="">اختر الماركة</option>
                 <!-- Haute Horlogerie -->
                 <option>Rolex</option>
@@ -610,7 +610,8 @@
             </div>
             <div class="post-field">
               <label id="lblModel">الموديل <span>*</span></label>
-              <input type="text" class="post-input" id="pModel" placeholder="مثال: Submariner، Nautilus..." oninput="updatePreview()">
+              <input type="text" class="post-input" id="pModel" list="pModelOptions" autocomplete="off" placeholder="مثال: Submariner، Nautilus..." oninput="updatePreview()">
+              <datalist id="pModelOptions"></datalist>
             </div>
           </div>
           <div class="post-grid cols3">
@@ -1134,6 +1135,7 @@
 <script src="js/favorites.js"></script>
 <script src="js/listings.js"></script>
 <script src="js/detail.js"></script>
+<script src="js/brand-models.js"></script>
 <script src="js/post.js"></script>
 <script src="js/myads.js"></script>
 <script src="js/profile.js"></script>

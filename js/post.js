@@ -160,6 +160,21 @@ async function uploadImages(){
   return urls;
 }
 
+// Brand → model dependent picker. Fills the datalist under #pModel with the
+// chosen brand's model lines (window.BRAND_MODELS, loaded from js/brand-models.js).
+// It's a datalist, so the seller can pick from the list OR type a rare model.
+function populateModelOptions(brand){
+  const dl = document.getElementById('pModelOptions');
+  if(!dl) return;
+  const models = (window.BRAND_MODELS && window.BRAND_MODELS[brand]) || [];
+  dl.innerHTML = models.map(m => `<option value="${String(m).replace(/"/g,'&quot;')}"></option>`).join('');
+}
+function onBrandChange(){
+  const pm = document.getElementById('pModel');
+  if(pm) pm.value = '';          // clear stale model when the brand changes
+  populateModelOptions(document.getElementById('pBrand').value);
+}
+
 function updatePreview(){
   const brand=document.getElementById('pBrand').value;
   const model=document.getElementById('pModel').value;

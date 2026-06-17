@@ -86,6 +86,7 @@ function editListing(id){
     const set = (elId, val) => { const el = document.getElementById(elId); if(el && val != null) el.value = val; };
     set('pTitle', l.title);
     set('pBrand', l.brand);
+    if(typeof populateModelOptions==='function') populateModelOptions(l.brand);
     updateTitleCounter();
     updateDescCounter();
     set('pModel', l.model);

@@ -511,7 +511,7 @@ function applyTranslations(){
 
   // Post form — input placeholders
   const ph = (id,ar,en)=>{ const el=document.getElementById(id); if(el) el.placeholder = currentLang==='ar'?ar:en; };
-  ph('pModel','مثال: Submariner، Nautilus...','e.g. Submariner, Nautilus...');
+  ph('pModel','اختر الموديل أو اكتبه','Pick a model or type it');
   ph('pRef','مثال: 116610LN','e.g. 116610LN');
   ph('pYear','مثال: 2021','e.g. 2021');
   ph('pDial','مثال: أسود، أزرق...','e.g. Black, Blue...');
