@@ -579,6 +579,8 @@ function applyTranslations(){
 
   // Re-render grids to pick up new labels
   renderHomeGrid();
+  if(typeof renderBrandDirectory==='function') renderBrandDirectory();
+  if(currentView==='brand' && typeof renderBrandPage==='function') renderBrandPage(currentBrandSlug);
   if(currentView==='listings') filterListings();
   if(currentView==='myads') renderMyAds();
 }

@@ -305,6 +305,7 @@ async function adminSavePlan(id){
 function homeTab(name){
   document.querySelectorAll('.home-tab').forEach(t=>t.classList.toggle('active', t.dataset.tab===name));
   document.querySelectorAll('.home-panel').forEach(p=>p.classList.toggle('panel-active', p.dataset.panel===name));
+  if(name==='brands' && typeof renderBrandDirectory==='function') renderBrandDirectory();
 }
 
 // Top dealers = sellers with the most active listings (derived from listings data)

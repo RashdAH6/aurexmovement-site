@@ -211,20 +211,7 @@
   <!-- Brands panel -->
   <section class="home-panel" data-panel="brands" style="padding:40px 4vw">
     <div style="max-width:1100px;margin:0 auto">
-      <div class="brand-grid">
-        <div class="brand-card" onclick="filterByBrand('Rolex')"><span class="brand-card-name">Rolex</span><span class="brand-card-sub">Geneva · CH</span></div>
-        <div class="brand-card" onclick="filterByBrand('Patek Philippe')"><span class="brand-card-name">Patek Philippe</span><span class="brand-card-sub">Geneva · CH</span></div>
-        <div class="brand-card" onclick="filterByBrand('Audemars Piguet')"><span class="brand-card-name">Audemars Piguet</span><span class="brand-card-sub">Le Brassus · CH</span></div>
-        <div class="brand-card" onclick="filterByBrand('Richard Mille')"><span class="brand-card-name">Richard Mille</span><span class="brand-card-sub">France · CH</span></div>
-        <div class="brand-card" onclick="filterByBrand('Cartier')"><span class="brand-card-name">Cartier</span><span class="brand-card-sub">Paris · FR</span></div>
-        <div class="brand-card" onclick="filterByBrand('Omega')"><span class="brand-card-name">Omega</span><span class="brand-card-sub">Biel · CH</span></div>
-        <div class="brand-card" onclick="filterByBrand('Tudor')"><span class="brand-card-name">Tudor</span><span class="brand-card-sub">Geneva · CH</span></div>
-        <div class="brand-card" onclick="filterByBrand('Hublot')"><span class="brand-card-name">Hublot</span><span class="brand-card-sub">Nyon · CH</span></div>
-        <div class="brand-card" onclick="filterByBrand('IWC')"><span class="brand-card-name">IWC</span><span class="brand-card-sub">Schaffhausen · CH</span></div>
-        <div class="brand-card" onclick="filterByBrand('Breitling')"><span class="brand-card-name">Breitling</span><span class="brand-card-sub">Grenchen · CH</span></div>
-        <div class="brand-card" onclick="filterByBrand('Vacheron Constantin')"><span class="brand-card-name">Vacheron Constantin</span><span class="brand-card-sub">Geneva · CH</span></div>
-        <div class="brand-card brand-card-all" onclick="filterByBrand('')"><span class="brand-card-name" id="brandsAllName">عرض الكل</span></div>
-      </div>
+      <div id="brandGrid" class="brand-grid"></div>
     </div>
   </section>
 
@@ -282,6 +269,11 @@
       <p style="font-size:.7rem;color:rgba(167,167,167,.5);margin-top:1rem;letter-spacing:.08em">support@aurexmovement.com</p>
     </div>
   </div>
+</div>
+
+<!-- ═══ BRAND VIEW ═══ -->
+<div class="view" id="view-brand">
+  <div id="brandPage"></div>
 </div>
 
 <!-- ═══ LISTINGS VIEW ═══ -->
@@ -1136,6 +1128,8 @@
 <script src="js/listings.js"></script>
 <script src="js/detail.js"></script>
 <script src="js/brand-models.js"></script>
+<script src="js/brand-info.js"></script>
+<script src="js/brands.js"></script>
 <script src="js/post.js"></script>
 <script src="js/myads.js"></script>
 <script src="js/profile.js"></script>

@@ -1,4 +1,4 @@
-const CACHE = 'aurex-v22';
+const CACHE = 'aurex-v23';
 const STATIC = [
   '/',
   '/index.html',
@@ -13,6 +13,8 @@ const STATIC = [
   '/js/listings.js',
   '/js/detail.js',
   '/js/brand-models.js',
+  '/js/brand-info.js',
+  '/js/brands.js',
   '/js/post.js',
   '/js/myads.js',
   '/js/profile.js',
