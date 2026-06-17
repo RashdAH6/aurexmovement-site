@@ -162,8 +162,9 @@ async function shareListing(id){
 
 // Open a listing directly if the URL contains #watch-{id}
 async function handleHashRoute(){
-  const h = location.hash || '';
-  const m = h.match(/^#watch-(.+)$/);
+  // Open a watch from either the SPA hash (#watch-ID) or a real shared/SEO URL (/watch/ID).
+  let m = (location.hash || '').match(/^#watch-(.+)$/);
+  if(!m) m = location.pathname.match(/^\/watch\/(.+?)\/?$/);
   if(m){
     const id = m[1];
     if(!listings.length) await loadListings();
