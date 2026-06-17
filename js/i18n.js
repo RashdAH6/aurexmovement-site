@@ -555,6 +555,11 @@ function applyTranslations(){
   if(typeof currentView!=='undefined' && currentView==='admin' && typeof renderAdmin==='function') renderAdmin();
   // Dealer storefront
   safeText('dealerBackLbl', currentLang==='ar'?'‹ رجوع':'‹ Back');
+  // Google sign-in labels
+  safeText('googleLoginLbl', currentLang==='ar'?'المتابعة مع Google':'Continue with Google');
+  safeText('googleRegisterLbl', currentLang==='ar'?'المتابعة مع Google':'Continue with Google');
+  safeText('authOrLbl1', currentLang==='ar'?'أو':'or');
+  safeText('authOrLbl2', currentLang==='ar'?'أو':'or');
   if(typeof currentView!=='undefined' && currentView==='dealer' && typeof renderDealer==='function') renderDealer();
 
   // Post preview title

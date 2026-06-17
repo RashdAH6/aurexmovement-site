@@ -49,6 +49,20 @@ async function doRegister(){
   }
 }
 
+// Google sign-in / sign-up — bypasses email confirmation entirely.
+async function signInWithGoogle(){
+  try {
+    const { error } = await sb.auth.signInWithOAuth({
+      provider: 'google',
+      options: { redirectTo: window.location.origin }
+    });
+    if(error) throw error;
+    // browser now redirects to Google; session is set on return via onAuthStateChange
+  } catch(e){
+    showAuthError((currentLang==='ar'?'خطأ: ':'Error: ')+e.message);
+  }
+}
+
 async function doLogin(){
   const email = document.getElementById('loginEmail').value.trim();
   const pass = document.getElementById('loginPass').value;
