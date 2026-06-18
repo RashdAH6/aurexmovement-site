@@ -136,6 +136,7 @@ function updateNavForUser(){
     if(a){ a.style.backgroundImage=''; a.textContent='?'; }
   }
   refreshAdminUI();
+  if(typeof refreshRole==='function') refreshRole();
 }
 
 async function logout(){

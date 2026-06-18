@@ -298,6 +298,9 @@ html[dir="rtl"] .feat-badge{left:auto;right:.7rem}
 .ai-write-btn{background:transparent;border:1px solid var(--gold);color:var(--gold);font-family:inherit;font-size:.66rem;letter-spacing:.03em;padding:.3rem .75rem;border-radius:999px;cursor:pointer;white-space:nowrap;transition:all .2s}
 .ai-write-btn:hover{background:var(--gold);color:var(--bg)}
 .ai-write-btn:disabled{opacity:.6;cursor:default}
+.staff-add{display:flex;gap:.5rem;flex-wrap:wrap;padding:.4rem 0 .9rem;align-items:center}
+.staff-in{background:var(--bg);border:1px solid var(--border);color:var(--white);padding:.5rem .7rem;font-family:inherit;font-size:.82rem;border-radius:4px}
+.staff-add .staff-in:first-child{flex:1;min-width:170px}
 .am-sold{font-size:.55rem;color:var(--grey);border:1px solid var(--border);padding:.05rem .35rem;margin-inline-start:.5rem;text-transform:uppercase;letter-spacing:.1em}
 .admin-empty{background:var(--bg2);padding:3rem;text-align:center;color:var(--grey);font-size:.85rem}
 .admin-panel{background:var(--bg2);border:1px solid var(--border);border-radius:6px;padding:1rem;margin-bottom:1rem}

@@ -206,7 +206,7 @@ function _renderAdminPanels(pending){
   const el=document.getElementById('adminPanels'); if(!el) return;
   const ar=currentLang==='ar';
   let html='';
-  if(pending && pending.length){
+  if(isAdmin() && pending && pending.length){
     html += `<div class="admin-panel"><div class="admin-panel-t">${ar?'بانتظار تأكيد الدفع':'Awaiting payment confirmation'}</div>`;
     html += pending.map(l=>{
       const pl=(PLANS||[]).find(p=>p.id===l.plan); const pn=pl?(pl.name[ar?'ar':'en']+' · '+pl.price+' AED'):(l.plan||'');
@@ -218,7 +218,7 @@ function _renderAdminPanels(pending){
     }).join('') + `</div>`;
   }
   const plans = (PLANS && PLANS.length) ? PLANS : [];
-  if(plans.length){
+  if(isAdmin() && plans.length){
     html += `<div class="admin-panel"><div class="admin-panel-t">${ar?'الباقات والأسعار':'Plans & pricing'}</div>`;
     html += plans.map(p=>`<div class="plan-edit">
       <div class="plan-edit-name">${p.name[ar?'ar':'en']}</div>
@@ -229,14 +229,14 @@ function _renderAdminPanels(pending){
       <label class="plan-edit-chk"><input type="checkbox" id="pe_rec_${p.id}" ${p.recommended?'checked':''}> ${ar?'موصى':'Rec'}</label>
       <button class="am-tg" onclick="adminSavePlan('${p.id}')">${ar?'حفظ':'Save'}</button>
     </div>`).join('') + `</div>`;
-  } else {
+  } else if(isAdmin()){
     html += `<div class="admin-panel"><div class="admin-panel-t">${ar?'الباقات':'Plans'}</div><div style="font-size:.78rem;color:var(--grey);padding:.4rem">${ar?'شغّل AUREX_add_plans.sql لإدارة الأسعار هنا':'Run AUREX_add_plans.sql to manage pricing here'}</div></div>`;
   }
   // Users panel — every seller, with verify + jump-to-their-ads.
   const umap={};
   listings.forEach(l=>{ if(!l.userId) return; if(!umap[l.userId]) umap[l.userId]={id:l.userId,name:l.userName||(ar?'بائع':'Seller'),avatar:l.sellerAvatar||'',count:0,live:0,verified:false}; const u=umap[l.userId]; u.count++; if(isLive(l))u.live++; if(l.verified)u.verified=true; if(!u.avatar&&l.sellerAvatar)u.avatar=l.sellerAvatar; });
   const users=Object.values(umap).sort((a,b)=>b.count-a.count);
-  if(users.length){
+  if(isAdmin() && users.length){
     html += `<div class="admin-panel"><div class="admin-panel-t">${ar?'المستخدمون':'Users'} (${users.length})</div>`;
     html += users.map(u=>{
       const safeName=String(u.name||'').replace(/['"\\<>]/g,' ').trim();
@@ -253,6 +253,28 @@ function _renderAdminPanels(pending){
         <div class="am-actions">${verBtn}<button class="am-tg" onclick="adminViewUserAds('${safeName}')">${ar?'إعلاناته':'Ads'}</button></div>
       </div>`;
     }).join('') + `</div>`;
+  }
+  // Staff panel (OWNER only) — grant Moderator/Admin access by email.
+  if(isOwner()){
+    const roleLabel = r => r==='admin' ? (ar?'مدير — صلاحية كاملة':'Admin — full access') : (ar?'مشرف — حذف/إخفاء فقط':'Moderator — hide/delete only');
+    html += `<div class="admin-panel"><div class="admin-panel-t">${ar?'الفريق':'Staff'}</div>`;
+    html += `<div class="staff-add">
+      <input id="staffEmail" type="email" placeholder="${ar?'إيميل الشخص':'person@email.com'}" class="staff-in">
+      <select id="staffRole" class="staff-in">
+        <option value="moderator">${ar?'مشرف':'Moderator'}</option>
+        <option value="admin">${ar?'مدير':'Admin'}</option>
+      </select>
+      <button class="am-tg on" onclick="adminAddStaff()">${ar?'منح صلاحية':'Grant'}</button>
+    </div>`;
+    if(STAFF && STAFF.length){
+      html += STAFF.map(s=>`<div class="am-row">
+        <div class="am-info"><div class="am-name">${escapeHtml(s.email)}</div><div class="am-sub">${roleLabel(s.role)}</div></div>
+        <div class="am-actions"><button class="am-tg am-del" onclick="adminRemoveStaff('${String(s.email).replace(/['"\\]/g,'')}')">${ar?'إزالة':'Remove'}</button></div>
+      </div>`).join('');
+    } else {
+      html += `<div style="font-size:.75rem;color:var(--grey);padding:.6rem .2rem">${ar?'لا أحد بعد. أضف إيميل شخص وامنحه صلاحية مشرف أو مدير.':"No one yet. Add a person's email and grant Moderator or Admin."}</div>`;
+    }
+    html += `</div>`;
   }
   el.innerHTML = html;
 }
@@ -273,10 +295,10 @@ function _renderAdminRows(){
     if(l.planStatus==='pending') tags+=`<span class="am-sold" style="color:#e0a64b;border-color:#e0a64b">${ar?'بانتظار الدفع':'Pending'}</span>`;
     if(isExpired(l)) tags+=`<span class="am-sold">${ar?'منتهٍ':'Expired'}</span>`;
     if(l.status==='hidden') tags+=`<span class="am-sold">${ar?'مخفي':'Hidden'}</span>`;
-    const featBtn = isFeatured(l)
+    const featBtn = isAdmin() ? (isFeatured(l)
       ? `<button class="am-tg on" onclick="adminUnfeature('${l.id}')">★ ${ar?'مميّز':'Featured'}</button>`
-      : `<button class="am-tg" onclick="adminSetFeatured('${l.id}',30)">★ ${ar?'تمييز':'Feature'}</button>`;
-    const verBtn = l.userId ? (l.verified
+      : `<button class="am-tg" onclick="adminSetFeatured('${l.id}',30)">★ ${ar?'تمييز':'Feature'}</button>`) : '';
+    const verBtn = (isAdmin() && l.userId) ? (l.verified
       ? `<button class="am-tg on" onclick="adminUnverifySeller('${l.userId}')">✓ ${ar?'موثّق':'Verified'}</button>`
       : `<button class="am-tg" onclick="adminVerifySeller('${l.userId}')">✓ ${ar?'توثيق':'Verify'}</button>`) : '';
     const hideBtn = l.status==='hidden'
@@ -332,7 +354,7 @@ async function adminSavePlan(id){
 
 // ── Admin moderation: hide/activate + delete any listing (needs the admin RLS policies) ──
 async function adminSetHidden(id, hide){
-  if(!isAdmin()) return;
+  if(!canModerate()) return;
   const ar=currentLang==='ar';
   const { error } = await sb.from('listings').update({ status: hide?'hidden':'available' }).eq('id', id);
   if(error){ toast('Error: '+error.message); return; }
@@ -341,7 +363,7 @@ async function adminSetHidden(id, hide){
   renderAdmin();
 }
 async function adminDeleteListing(id){
-  if(!isAdmin()) return;
+  if(!canModerate()) return;
   const ar=currentLang==='ar';
   if(!confirm(ar?'حذف هذا الإعلان نهائياً؟ لا يمكن التراجع.':'Permanently delete this listing? This cannot be undone.')) return;
   const { error } = await sb.from('listings').delete().eq('id', id);
@@ -355,6 +377,33 @@ function adminViewUserAds(name){
   const s=document.getElementById('adminSearch'); if(s) s.value=name;
   if(typeof filterAdminList==='function') filterAdminList();
   document.getElementById('adminList')?.scrollIntoView({behavior:'smooth', block:'start'});
+}
+
+// ── Staff management (OWNER only): grant/revoke Moderator/Admin by email ──
+async function loadStaff(){
+  if(!isOwner()){ STAFF=[]; return; }
+  try { const { data } = await sb.from('staff').select('email,role,added_at').order('added_at',{ascending:true}); STAFF = data||[]; }
+  catch(e){ STAFF=[]; }
+}
+async function adminAddStaff(){
+  if(!isOwner()) return;
+  const ar=currentLang==='ar';
+  const email=(document.getElementById('staffEmail')?.value||'').trim().toLowerCase();
+  const role=(document.getElementById('staffRole')?.value||'moderator');
+  if(!email || email.indexOf('@')<1){ toast(ar?'أدخل إيميل صحيح':'Enter a valid email'); return; }
+  if(email===ADMIN_EMAIL.toLowerCase()){ toast(ar?'هذا إيميلك (المالك)':'That is your owner email'); return; }
+  const { error } = await sb.from('staff').upsert({ email, role }, { onConflict:'email' });
+  if(error){ toast('Error: '+error.message); return; }
+  await loadStaff(); renderAdmin();
+  toast(ar?'تم منح الصلاحية ✦':'Access granted ✦');
+}
+async function adminRemoveStaff(email){
+  if(!isOwner()) return;
+  const ar=currentLang==='ar';
+  const { error } = await sb.from('staff').delete().eq('email', email);
+  if(error){ toast('Error: '+error.message); return; }
+  await loadStaff(); renderAdmin();
+  toast(ar?'تمت الإزالة':'Removed');
 }
 
 // Switch the home content tab (Latest / Top Dealers / Brands / Verified)

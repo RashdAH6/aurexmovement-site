@@ -36,12 +36,23 @@ const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY, {
 
 // Admin (you) — gates the in-app "Feature" controls. The REAL security is the RLS policy
 // on featured_listings (admin email only); this check just shows/hides the buttons.
+// The OWNER (super-admin): always full admin, and the only one who manages staff.
 const ADMIN_EMAIL = 'rashed.alshamsi731@gmail.com';
-function isAdmin(){ return !!(currentUser && currentUser.email && currentUser.email.toLowerCase() === ADMIN_EMAIL.toLowerCase()); }
-// Show/hide elements tagged .admin-only depending on whether the current user is the admin.
+function isOwner(){ return !!(currentUser && currentUser.email && currentUser.email.toLowerCase() === ADMIN_EMAIL.toLowerCase()); }
+function isAdmin(){ return isOwner() || currentRole === 'admin'; }            // full access
+function canModerate(){ return isAdmin() || currentRole === 'moderator'; }     // can hide/delete listings
+// Show/hide UI by role: .admin-only = full admins; .mod-only = moderators + admins.
 function refreshAdminUI(){
-  const show = isAdmin();
-  document.querySelectorAll('.admin-only').forEach(e=>{ e.style.display = show ? (e.getAttribute('data-disp') || 'block') : 'none'; });
+  document.querySelectorAll('.admin-only').forEach(e=>{ e.style.display = isAdmin() ? (e.getAttribute('data-disp') || 'block') : 'none'; });
+  document.querySelectorAll('.mod-only').forEach(e=>{ e.style.display = canModerate() ? (e.getAttribute('data-disp') || 'block') : 'none'; });
+}
+// Look up the logged-in user's role from the DB (owner is always admin).
+async function refreshRole(){
+  if(!currentUser){ currentRole = null; refreshAdminUI(); return; }
+  if(isOwner()){ currentRole = 'admin'; refreshAdminUI(); return; }
+  try { const { data } = await sb.rpc('aurex_role'); currentRole = data || null; }
+  catch(e){ currentRole = null; }
+  refreshAdminUI();
 }
 
 // Early function definitions (needed before DOM ready)
@@ -73,4 +84,6 @@ let slotImages = [null,null,null,null];
 let slotFiles = [null,null,null,null];
 let postAfterAuth = null;
 let editingListingId = null;
+let currentRole = null;   // 'admin' | 'moderator' | null — fetched from the staff list
+let STAFF = [];           // staff list (owner view only)
 

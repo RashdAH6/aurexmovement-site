@@ -27,7 +27,7 @@ async function showView(v){
   if(v==='home'){ await loadListings(); renderHomeGrid(); updateStatCount(); }
   if(v==='post'){ editingListingId = null; resetPostForm(); }
   if(v==='profile'){ await loadListings(); loadProfile(); }
-  if(v==='admin'){ if(!isAdmin()) return showView('home'); await loadListings(); renderAdmin(); }
+  if(v==='admin'){ if(!canModerate()) return showView('home'); await loadListings(); if(isOwner() && typeof loadStaff==='function') await loadStaff(); renderAdmin(); }
   if(v==='dealer'){ await loadListings(); renderDealer(); }
   if(v==='brand'){
     renderBrandPage(currentBrandSlug);                       // paint immediately (content needs no network)
