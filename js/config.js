@@ -36,9 +36,10 @@ const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY, {
 
 // Admin (you) — gates the in-app "Feature" controls. The REAL security is the RLS policy
 // on featured_listings (admin email only); this check just shows/hides the buttons.
-// The OWNER (super-admin): always full admin, and the only one who manages staff.
-const ADMIN_EMAIL = 'rashed.alshamsi731@gmail.com';
-function isOwner(){ return !!(currentUser && currentUser.email && currentUser.email.toLowerCase() === ADMIN_EMAIL.toLowerCase()); }
+// The OWNERS (super-admins): always full admin, and the only ones who manage staff.
+const OWNER_EMAILS = ['rashed.alshamsi731@gmail.com', 'rashed@aurexmovement.com'];
+const ADMIN_EMAIL = OWNER_EMAILS[0]; // primary owner (kept for legacy references)
+function isOwner(){ return !!(currentUser && currentUser.email && OWNER_EMAILS.includes(currentUser.email.toLowerCase())); }
 function isAdmin(){ return isOwner() || currentRole === 'admin'; }            // full access
 function canModerate(){ return isAdmin() || currentRole === 'moderator'; }     // can hide/delete listings
 // Show/hide UI by role: .admin-only = full admins; .mod-only = moderators + admins.

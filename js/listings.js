@@ -391,7 +391,7 @@ async function adminAddStaff(){
   const email=(document.getElementById('staffEmail')?.value||'').trim().toLowerCase();
   const role=(document.getElementById('staffRole')?.value||'moderator');
   if(!email || email.indexOf('@')<1){ toast(ar?'أدخل إيميل صحيح':'Enter a valid email'); return; }
-  if(email===ADMIN_EMAIL.toLowerCase()){ toast(ar?'هذا إيميلك (المالك)':'That is your owner email'); return; }
+  if(typeof OWNER_EMAILS!=='undefined' && OWNER_EMAILS.includes(email)){ toast(ar?'هذا إيميل مالك':'That is an owner email'); return; }
   const { error } = await sb.from('staff').upsert({ email, role }, { onConflict:'email' });
   if(error){ toast('Error: '+error.message); return; }
   await loadStaff(); renderAdmin();
