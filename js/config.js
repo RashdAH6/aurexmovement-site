@@ -87,4 +87,5 @@ let postAfterAuth = null;
 let editingListingId = null;
 let currentRole = null;   // 'admin' | 'moderator' | null — fetched from the staff list
 let STAFF = [];           // staff list (owner view only)
+let ANALYTICS = { views:0, contacts:0 };  // 7-day counts shown in the admin dashboard
 

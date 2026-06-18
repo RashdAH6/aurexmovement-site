@@ -17,6 +17,7 @@ function openDetail(id, skipHash){
   const l = listings.find(l=>l.id===id);
   if(!l) return;
   currentDetailId = id;
+  if(typeof track==='function') track('listing_view', { id: l.id, brand: l.brand });
   if(!skipHash){
     try { history.pushState({watch:id}, '', '#watch-'+id); } catch(e){ location.hash = 'watch-'+id; }
   }
@@ -118,7 +119,7 @@ function revealContact(id){
   if(!l) return;
   const box = document.getElementById('contactReveal');
   if(!box) return;
-  if(typeof track==='function') track('contact_reveal', { brand: l.brand });
+  if(typeof track==='function') track('contact_reveal', { id: l.id, brand: l.brand });
   const waNum = waNumber(l.wa);
   const L = T[currentLang];
   if(!waNum){

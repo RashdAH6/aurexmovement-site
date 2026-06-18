@@ -174,6 +174,17 @@ function _adminAfter(){
 }
 
 // Admin dashboard: metrics + pending approvals + plans editor + listing rows.
+// Free analytics: 7-day view + contact counts from the events table (owner-read).
+async function loadAnalytics(){
+  if(!isAdmin()) return;
+  const since = new Date(Date.now()-7*86400000).toISOString();
+  try {
+    const v = await sb.from('events').select('id',{count:'exact',head:true}).eq('type','view').gte('created_at',since);
+    const c = await sb.from('events').select('id',{count:'exact',head:true}).eq('type','contact').gte('created_at',since);
+    ANALYTICS = { views: v.count||0, contacts: c.count||0 };
+  } catch(e){}
+}
+
 function renderAdmin(){
   const ar = currentLang==='ar';
   const live = listings.filter(l=>isLive(l)).length;
@@ -187,7 +198,9 @@ function renderAdmin(){
     [ar?'مميّزة':'Featured', featCount],
     [ar?'بانتظار الدفع':'Pending', pending.length],
     [ar?'تجار موثّقون':'Verified', verDealers],
-    [ar?'المستخدمون':'Users', userCount]
+    [ar?'المستخدمون':'Users', userCount],
+    [ar?'مشاهدات 7ي':'Views 7d', ANALYTICS.views],
+    [ar?'تواصل 7ي':'Contacts 7d', ANALYTICS.contacts]
   ].map(x=>`<div class="admin-metric"><div class="am-lbl">${x[0]}</div><div class="am-num">${x[1]}</div></div>`).join('');
   _renderAdminPanels(pending);
   _renderAdminRows();

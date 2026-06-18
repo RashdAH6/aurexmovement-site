@@ -5,7 +5,15 @@
 // ════════════════════════════════════════════════
 // Lightweight event tracking — no-op unless an events tool (e.g. Plausible) is loaded.
 // Page views come from Cloudflare Web Analytics (enable it in the Cloudflare dashboard).
-function track(name, props){ try { if(window.plausible) window.plausible(name, props ? { props } : undefined); } catch(e){} }
+function track(name, props){
+  try { if(window.plausible) window.plausible(name, props ? { props } : undefined); } catch(e){}
+  try {
+    const type = name==='contact_reveal' ? 'contact' : (name==='listing_view' ? 'view' : null);
+    if(type && typeof sb!=='undefined' && sb.from){
+      sb.from('events').insert({ type, listing_id:(props&&props.id)||null, brand:(props&&props.brand)||null });
+    }
+  } catch(e){}
+}
 
 async function init(){
   // Listen for auth changes FIRST — so a Google sign-in that completes while the page is
