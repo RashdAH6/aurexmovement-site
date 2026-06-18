@@ -13,6 +13,13 @@ if (window.IS_IN_APP) {
   document.addEventListener('DOMContentLoaded', () => document.body.classList.add('in-app'));
 }
 
+// "Write with AI" seller helper — hidden until you add ANTHROPIC_API_KEY in Cloudflare.
+// When the key is live, set AI_ENABLED to true and redeploy; the button reappears.
+window.AI_ENABLED = false;
+document.addEventListener('DOMContentLoaded', () => {
+  if (!window.AI_ENABLED) { const b = document.getElementById('aiWriteBtn'); if (b) b.style.display = 'none'; }
+});
+
 // ════════════════════════════════════════════════
 // SUPABASE CONFIG
 // ════════════════════════════════════════════════
