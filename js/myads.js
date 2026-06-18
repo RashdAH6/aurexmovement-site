@@ -46,8 +46,9 @@ async function markSold(id){
   const l=listings.find(l=>l.id===id);
   if(!l || l.userId !== currentUser?.id){ toast(currentLang==='ar'?'غير مصرح':'Not authorized'); return; }
   try {
-    await sb.from('listings').update({status:'sold'}).eq('id',id).eq('user_id',currentUser.id);
-    await loadListings(true); renderMyAds(); updateStatCount(); renderHomeGrid();
+    const { error } = await sb.from('listings').update({status:'sold'}).eq('id',id).eq('user_id',currentUser.id);
+    if(error) throw error;
+    await loadListings(true); renderMyAds(); renderHomeGrid();
     toast(currentLang==='ar'?'تم تحديث الإعلان كمُباع':'Listing marked as sold');
   } catch(e){ toast('Error: '+e.message); }
 }
@@ -56,8 +57,9 @@ async function relistListing(id){
   const l=listings.find(l=>l.id===id);
   if(!l || l.userId !== currentUser?.id){ toast(currentLang==='ar'?'غير مصرح':'Not authorized'); return; }
   try {
-    await sb.from('listings').update({status:'available'}).eq('id',id).eq('user_id',currentUser.id);
-    await loadListings(true); renderMyAds(); updateStatCount(); renderHomeGrid();
+    const { error } = await sb.from('listings').update({status:'available'}).eq('id',id).eq('user_id',currentUser.id);
+    if(error) throw error;
+    await loadListings(true); renderMyAds(); renderHomeGrid();
     toast(currentLang==='ar'?'تم إعادة نشر الإعلان':'Listing is live again');
   } catch(e){ toast('Error: '+e.message); }
 }
@@ -67,8 +69,9 @@ async function deleteListing(id){
   if(!l || l.userId !== currentUser?.id){ toast(currentLang==='ar'?'غير مصرح':'Not authorized'); return; }
   if(!confirm(currentLang==='ar'?'هل تريد حذف هذا الإعلان؟':'Delete this listing?')) return;
   try {
-    await sb.from('listings').delete().eq('id',id).eq('user_id',currentUser.id);
-    await loadListings(true); renderMyAds(); updateStatCount(); renderHomeGrid();
+    const { error } = await sb.from('listings').delete().eq('id',id).eq('user_id',currentUser.id);
+    if(error) throw error;
+    await loadListings(true); renderMyAds(); renderHomeGrid();
     toast(currentLang==='ar'?'تم حذف الإعلان':'Listing deleted');
   } catch(e){ toast('Error: '+e.message); }
 }

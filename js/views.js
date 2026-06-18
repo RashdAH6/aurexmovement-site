@@ -24,7 +24,7 @@ async function showView(v){
   if(v==='myads'){ await loadListings(); renderMyAds(); }
   if(v==='favorites'){ await loadListings(); await loadFavorites(); renderFavorites(); }
   if(v==='ai'){ await loadListings(); renderAI(); }
-  if(v==='home'){ await loadListings(); renderHomeGrid(); updateStatCount(); }
+  if(v==='home'){ await loadListings(); renderHomeGrid(); }
   if(v==='post'){ editingListingId = null; resetPostForm(); }
   if(v==='profile'){ await loadListings(); loadProfile(); }
   if(v==='admin'){ if(!canModerate()) return showView('home'); await loadListings(); if(isOwner() && typeof loadStaff==='function') await loadStaff(); renderAdmin(); }
@@ -33,7 +33,6 @@ async function showView(v){
     renderBrandPage(currentBrandSlug);                       // paint immediately (content needs no network)
     loadListings().then(()=>{ if(currentView==='brand') renderBrandPage(currentBrandSlug); }); // refresh live count
   }
-  if(v==='terms'){ renderTerms(); }
 }
 
 function goBack(){

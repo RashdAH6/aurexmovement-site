@@ -1,4 +1,4 @@
-const CACHE = 'aurex-v23';
+const CACHE = 'aurex-v24';
 const STATIC = [
   '/',
   '/index.html',

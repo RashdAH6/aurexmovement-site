@@ -3,6 +3,10 @@
 // ════════════════════════════════════════════════
 // INIT
 // ════════════════════════════════════════════════
+// Lightweight event tracking — no-op unless an events tool (e.g. Plausible) is loaded.
+// Page views come from Cloudflare Web Analytics (enable it in the Cloudflare dashboard).
+function track(name, props){ try { if(window.plausible) window.plausible(name, props ? { props } : undefined); } catch(e){} }
+
 async function init(){
   // Listen for auth changes FIRST — so a Google sign-in that completes while the page is
   // still loading isn't missed (registering this late caused "returns but logged out").
@@ -57,7 +61,6 @@ async function init(){
   await loadListings();
   await loadFavorites();
   renderHomeGrid();
-  updateStatCount();
   // If opened via a shared #watch-{id} link, jump straight to it
   await handleHashRoute();
   window.scrollTo(0,0);

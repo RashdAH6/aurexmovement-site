@@ -61,7 +61,7 @@ function wizValidate(n){
     if(!v('pCond')){ toast(ar?'اختر الحالة':'Choose the condition'); return false; }
   }
   if(n===2){
-    if(!v('pPrice')){ toast(ar?'أدخل السعر':'Enter the price'); return false; }
+    // price is optional — a listing with no price shows as "Negotiable / price on request"
     if((v('pWA')||'').replace(/\D/g,'').length<7){ toast(ar?'أدخل رقم واتساب صحيح':'Enter a valid WhatsApp number'); return false; }
   }
   return true;
@@ -319,7 +319,7 @@ async function submitListing(){
     toast(isEdit
       ? (currentLang==='ar'?'تم حفظ التعديلات ✦':'Changes saved ✦')
       : (currentLang==='ar'?'نُشر إعلانك بنجاح! ✦':'Listing published! ✦'));
-    await loadListings(true); renderHomeGrid(); updateStatCount();
+    await loadListings(true); renderHomeGrid();
   } catch(e){
     console.error(e);
     toast(currentLang==='ar'?'خطأ: '+e.message:'Error: '+e.message);

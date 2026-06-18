@@ -78,15 +78,6 @@ async function loadListings(force = false){
 }
 
 
-function updateStatCount(){
-  const el = document.getElementById('statCount');
-  if(!el) return;
-  const target = listings.filter(l=>l.status==='available').length;
-  let n=0; const step = Math.max(1,Math.ceil(target/30));
-  const t = setInterval(()=>{ n=Math.min(n+step,target); el.textContent=n; if(n>=target)clearInterval(t); },40);
-}
-
-
 // ════════════════════════════════════════════════
 // LISTINGS RENDER
 // ════════════════════════════════════════════════

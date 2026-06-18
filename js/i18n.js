@@ -1,4 +1,4 @@
-// i18n.js — translation table T + setLang / t / applyTranslations / renderTerms.
+// i18n.js — translation table T + setLang / t / applyTranslations.
 
 // ════════════════════════════════════════════════
 // SETTINGS — THEME & LANGUAGE
@@ -51,7 +51,7 @@ const T = {
     specsBrand:'الماركة', specsModel:'الموديل', specsRef:'رقم المرجع',
     specsYear:'سنة الإنتاج', specsCond:'الحالة', specsSet:'البوكس والأوراق',
     specsDial:'لون الديال', specsCity:'الإمارة',
-    sellerLabel:'بائع موثق', priceFixed:'السعر ثابت', priceNeg:'قابل للتفاوض',
+    sellerLabel:'بائع', priceFixed:'السعر ثابت', priceNeg:'قابل للتفاوض',
     termsText:'أؤكد أن المعلومات المدخلة صحيحة وأن الساعة أصيلة 100%. أوافق على قواعد Aurex Movement للبيع والشراء.',
     emptyTitle:'لا توجد إعلانات بعد',
     emptySubTitle:'كن أول من ينشر ساعته!',
@@ -113,7 +113,7 @@ const T = {
     specsBrand:'Brand', specsModel:'Model', specsRef:'Reference No.',
     specsYear:'Year', specsCond:'Condition', specsSet:'Box & Papers',
     specsDial:'Dial Color', specsCity:'Emirate',
-    sellerLabel:'Verified Seller', priceFixed:'Fixed Price', priceNeg:'Price Negotiable',
+    sellerLabel:'Seller', priceFixed:'Fixed Price', priceNeg:'Price Negotiable',
     termsText:'I confirm that all information is accurate and the watch is 100% authentic. I agree to Aurex Movement\'s terms.',
     emptyTitle:'No listings yet',
     emptySubTitle:'Be the first to list your watch!',
@@ -537,12 +537,6 @@ function applyTranslations(){
   safeText('successBrowseBtn', currentLang==='ar'?'تصفح السوق':'Browse Market');
   safeText('successMyAdsBtn', currentLang==='ar'?'إعلاناتي':'My Listings');
 
-  // Terms page
-  safeText('termsBackTxt', currentLang==='ar'?'العودة':'Back');
-  safeText('termsPageTitle', currentLang==='ar'?'الشروط والأحكام':'Terms & Conditions');
-  safeText('termsUpdated', currentLang==='ar'?'آخر تحديث: يونيو 2026':'Last updated: June 2026');
-  renderTerms();
-
   // Footer links
   safeText('footerHowLink', currentLang==='ar'?'كيف يعمل':'How It Works');
   safeText('footerTermsLink', L.footerTerms);
@@ -586,37 +580,5 @@ function applyTranslations(){
   if(currentView==='brand' && typeof renderBrandPage==='function') renderBrandPage(currentBrandSlug);
   if(currentView==='listings') filterListings();
   if(currentView==='myads') renderMyAds();
-}
-
-function renderTerms(){
-  const body = document.getElementById('termsBody');
-  if(!body) return;
-  const ar = [
-    ['طبيعة المنصة','Aurex Movement منصة إعلانات تتيح لأصحاب الساعات عرض ساعاتهم للبيع والتواصل مع المشترين مباشرةً. نحن وسيط عرض فقط، ولسنا طرفاً في أي عملية بيع أو شراء، ولا نملك أو نبيع أو نضمن أي ساعة معروضة على المنصة.'],
-    ['مسؤولية البائع','البائع وحده مسؤول عن صحة المعلومات والصور وأصالة الساعة وحالتها وسعرها. بنشر أي إعلان، يقرّ البائع أن الساعة أصلية وأن جميع التفاصيل صحيحة، وأنه يملك الحق في بيعها.'],
-    ['الصفقات بين الطرفين','جميع المفاوضات والمدفوعات والتسليم تتم مباشرةً بين البائع والمشتري خارج المنصة. Aurex Movement لا تتدخل في الدفع ولا تتحمّل أي مسؤولية عن الأموال أو السلع أو أي نزاع ينشأ بين الطرفين.'],
-    ['التحقق والاحتيال','ننصح المشترين بفحص الساعة والتحقق من أصالتها قبل الدفع. نحتفظ بحق حذف أي إعلان مخالف أو مشبوه أو كاذب دون إشعار مسبق.'],
-    ['المحتوى الممنوع','يُمنع نشر إعلانات لساعات مقلّدة أو مسروقة أو غير قانونية، أو أي محتوى مخالف للأنظمة في دولة الإمارات. أي مخالفة قد تؤدي لحذف الحساب.'],
-    ['حدود المسؤولية','تُقدَّم المنصة "كما هي". لا نضمن استمرار الخدمة دون انقطاع، ولا نتحمّل أي خسائر مباشرة أو غير مباشرة ناتجة عن استخدام الموقع أو التعامل مع المستخدمين الآخرين.'],
-    ['الخصوصية','نجمع فقط البيانات اللازمة لتشغيل المنصة (الاسم، الإيميل، رقم الواتساب). رقم الواتساب يظهر للمشترين بغرض التواصل. لا نبيع بياناتك لأي طرف ثالث.'],
-    ['التواصل','لأي استفسار أو بلاغ عن إعلان مخالف، راسلنا على support@aurexmovement.com']
-  ];
-  const en = [
-    ['Nature of the Platform','Aurex Movement is a listings platform that lets watch owners showcase their watches for sale and connect with buyers directly. We are a listing intermediary only — not a party to any sale, and we do not own, sell, or guarantee any watch listed on the platform.'],
-    ['Seller Responsibility','The seller is solely responsible for the accuracy of the information, photos, authenticity, condition, and price of the watch. By posting a listing, the seller confirms the watch is authentic, all details are correct, and they have the right to sell it.'],
-    ['Transactions Between Parties','All negotiations, payments, and delivery happen directly between buyer and seller, off the platform. Aurex Movement is not involved in payment and bears no responsibility for funds, goods, or any dispute arising between the parties.'],
-    ['Verification & Fraud','We advise buyers to inspect the watch and verify its authenticity before paying. We reserve the right to remove any violating, suspicious, or fraudulent listing without prior notice.'],
-    ['Prohibited Content','Listings for counterfeit, stolen, or illegal watches — or any content that violates UAE laws — are prohibited. Any violation may result in account removal.'],
-    ['Limitation of Liability','The platform is provided "as is". We do not guarantee uninterrupted service, and we are not liable for any direct or indirect losses arising from using the site or dealing with other users.'],
-    ['Privacy','We collect only the data needed to run the platform (name, email, WhatsApp number). Your WhatsApp number is shown to buyers for contact purposes. We do not sell your data to any third party.'],
-    ['Contact','For any inquiry or to report a violating listing, email us at support@aurexmovement.com']
-  ];
-  const items = currentLang==='ar'?ar:en;
-  body.innerHTML = items.map((s,i)=>`
-    <div style="margin-bottom:1.8rem">
-      <h3 style="font-family:var(--serif);font-size:1.25rem;color:var(--gold);font-weight:400;margin-bottom:.5rem">${i+1}. ${s[0]}</h3>
-      <p style="font-size:.88rem;color:var(--grey);line-height:1.9">${s[1]}</p>
-    </div>
-  `).join('');
 }
 

@@ -71,14 +71,14 @@ function openDetail(id, skipHash){
         <div class="seller-avatar">${l.sellerAvatar?`<img src="${escapeHtml(l.sellerAvatar)}" alt="">`:escapeHtml(seller.name.charAt(0))}</div>
         <div><div class="seller-name">${escapeHtml(seller.name)}${l.verified?` <span class="verified-badge" title="${currentLang==='ar'?'تاجر موثق':'Verified Seller'}"><svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg></span>`:''}</div><div class="seller-since">${l.verified?(currentLang==='ar'?'تاجر موثق':'Verified Seller'):L.sellerLabel} · ${escapeHtml(l.city||'UAE')}</div></div>
       </div>
-      ${l.status==='available'?`
+      ${isLive(l)?`
       <div id="contactReveal" class="contact-reveal">
         <button class="detail-cta-reveal" onclick="revealContact('${l.id}')">
           <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
           ${currentLang==='ar'?'إظهار رقم التواصل':'Show Contact Number'}
         </button>
       </div>
-      `:`<div style="background:rgba(167,167,167,.08);border:1px solid rgba(167,167,167,.15);padding:1rem;text-align:center;font-size:.8rem;color:var(--grey)">${currentLang==='ar'?'هذه الساعة مُباعة':'This watch has been sold'}</div>`}
+      `:`<div style="background:rgba(167,167,167,.08);border:1px solid rgba(167,167,167,.15);padding:1rem;text-align:center;font-size:.8rem;color:var(--grey)">${l.status==='sold'?(currentLang==='ar'?'هذه الساعة مُباعة':'This watch has been sold'):(currentLang==='ar'?'هذا الإعلان لم يعد متاحاً':'This listing is no longer available')}</div>`}
       <button class="detail-cta-share" onclick="shareListing('${l.id}')">
         <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
         ${currentLang==='ar'?'مشاركة الإعلان':'Share Listing'}
@@ -105,6 +105,7 @@ function openDetail(id, skipHash){
           ${l.size?`<div class="spec-item"><div class="spec-label">${currentLang==='ar'?'قياس العلبة':'Case Size'}</div><div class="spec-val">${escapeHtml(l.size)} ${currentLang==='ar'?'مم':'mm'}</div></div>`:''}
           ${l.gender?`<div class="spec-item"><div class="spec-label">${currentLang==='ar'?'لمن':'Gender'}</div><div class="spec-val">${escapeHtml(tSpecVal(l.gender))}</div></div>`:''}
           ${l.bracelet?`<div class="spec-item"><div class="spec-label">${currentLang==='ar'?'السوار':'Bracelet'}</div><div class="spec-val">${escapeHtml(tSpecVal(l.bracelet))}</div></div>`:''}
+          ${l.warranty?`<div class="spec-item"><div class="spec-label">${currentLang==='ar'?'الضمان':'Warranty'}</div><div class="spec-val">${currentLang==='ar'?'يوجد ✓':'Yes ✓'}</div></div>`:''}
         </div>
       </div>
       ${l.desc?`<div class="detail-desc"><h3 class="detail-desc-title">${currentLang==='ar'?'وصف البائع':'Seller Description'}</h3><p>${escapeHtml(l.desc)}</p></div>`:''}
@@ -117,6 +118,7 @@ function revealContact(id){
   if(!l) return;
   const box = document.getElementById('contactReveal');
   if(!box) return;
+  if(typeof track==='function') track('contact_reveal', { brand: l.brand });
   const waNum = waNumber(l.wa);
   const L = T[currentLang];
   if(!waNum){
@@ -131,7 +133,8 @@ function revealContact(id){
       <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.12.554 4.112 1.523 5.843L0 24l6.335-1.505A11.95 11.95 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 21.818c-1.89 0-3.658-.51-5.172-1.397l-.371-.22-3.761.894.938-3.664-.242-.384A9.8 9.8 0 012.182 12C2.182 6.57 6.57 2.182 12 2.182S21.818 6.57 21.818 12 17.43 21.818 12 21.818z"/></svg>
       ${L.contactWa}
     </a>
-    <a class="detail-cta-call" href="tel:+${waNum}" rel="nofollow">📞 +${waNum}</a>`;
+    <a class="detail-cta-call" href="tel:+${waNum}" rel="nofollow">📞 +${waNum}</a>
+    <div class="contact-safety">${currentLang==='ar'?'⚠️ للسلامة: قابل البائع في مكان عام، افحص الساعة وأوراقها قبل الدفع، ولا ترسل أي مبلغ مقدّماً. Aurex وسيط عرض فقط ولا تتدخل في الدفع.':'⚠️ Stay safe: meet in a public place, inspect the watch & papers before paying, and never send a deposit in advance. Aurex is a listings platform only and is not part of the payment.'}</div>`;
 }
 
 async function shareListing(id){
