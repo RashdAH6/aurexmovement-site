@@ -18,7 +18,7 @@ async function loadProfile(){
 
   // Update display
   safeText('profileName', name);
-  safeText('profileWa', wa ? '+971 '+wa : '');
+  safeText('profileWa', wa ? '+'+waNumber(wa) : '');
   safeText('profileEmail', currentUser.email || '');
   safeText('profileBio', bio);
 
@@ -56,7 +56,7 @@ async function loadProfile(){
     container.innerHTML = myAds.map(l=>{
       const locale = currentLang==='ar'?'ar-AE':'en-AE';
       const price = l.price?Number(l.price).toLocaleString(locale)+' AED':(currentLang==='ar'?'تفاوضي':'Negotiable');
-      const img = l.images&&l.images[0]?`<img src="${l.images[0]}" style="width:60px;height:60px;object-fit:cover">`:`<div style="width:60px;height:60px;background:var(--bg);display:flex;align-items:center;justify-content:center;font-size:1.2rem;opacity:.3">⌚</div>`;
+      const img = l.images&&l.images[0]?`<img src="${escapeHtml(l.images[0])}" style="width:60px;height:60px;object-fit:cover">`:`<div style="width:60px;height:60px;background:var(--bg);display:flex;align-items:center;justify-content:center;font-size:1.2rem;opacity:.3">⌚</div>`;
       const statusLabel = l.status==='available'?(currentLang==='ar'?'نشط':'Active'):(currentLang==='ar'?'مُباع':'Sold');
       const statusColor = l.status==='available'?'var(--gold)':'var(--grey)';
       return `<div style="display:flex;align-items:center;gap:1rem;padding:1rem 0;border-bottom:1px solid var(--border2);cursor:pointer" onclick="openDetail('${l.id}')">
@@ -165,7 +165,7 @@ function openAccountInfo(){
   if(!currentUser) return;
   const myAds = listings.filter(l=>l.userId===currentUser.id).length;
   document.getElementById('acctNameVal').textContent = currentUser.name;
-  document.getElementById('acctWaVal').textContent = '+971 '+currentUser.wa;
+  document.getElementById('acctWaVal').textContent = '+'+waNumber(currentUser.wa);
   document.getElementById('acctAdsVal').textContent = myAds + (currentLang==='ar'?' إعلان':' listing(s)');
   document.getElementById('acctTitle').textContent = currentLang==='ar'?'معلومات الحساب':'Account Info';
   document.getElementById('acctNameLabel').textContent = currentLang==='ar'?'الاسم':'Name';

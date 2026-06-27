@@ -34,6 +34,97 @@ function resetPostForm(){
 }
 
 // ════════════════════════════════════════════════
+// DRAFT AUTOSAVE — persist an in-progress NEW listing so a dead battery /
+// closed app / reload doesn't lose the seller's work. (Edits are never drafted.)
+// ════════════════════════════════════════════════
+const DRAFT_KEY = 'aurex_post_draft_v1';
+const DRAFT_FIELDS = ['pTitle','pBrand','pModel','pRef','pYear','pDial','pCond','pSet','pDesc','pPrice','pNeg','pWA','pCity','pMovement','pMaterial','pSize','pGender','pBracelet','pWarranty'];
+let _draftLoading = false;       // true while resetting/restoring — suppresses saves
+let _suppressDraftOffer = false; // set by editListing so the resume banner doesn't show on edit
+
+function saveDraft(){
+  if(_draftLoading || editingListingId || !currentUser) return;
+  const fields = {};
+  DRAFT_FIELDS.forEach(id=>{ const el=document.getElementById(id); if(el) fields[id]=el.value; });
+  const hasText = Object.values(fields).some(v=>v && String(v).trim());
+  const hasImg  = (slotImages||[]).some(Boolean);
+  if(!hasText && !hasImg) return;  // nothing worth saving yet
+  const base = { user:currentUser.id, fields, plan:selectedPlan, step:(typeof wizStep!=='undefined'?wizStep:1), ts:Date.now() };
+  try {
+    localStorage.setItem(DRAFT_KEY, JSON.stringify({ ...base, images:(slotImages||[]).map(x=>x||null) }));
+  } catch(e){
+    try { localStorage.setItem(DRAFT_KEY, JSON.stringify(base)); } catch(_){}  // images too big → save text only
+  }
+}
+
+function getDraft(){
+  try {
+    const d = JSON.parse(localStorage.getItem(DRAFT_KEY) || 'null');
+    return (d && (!currentUser || d.user === currentUser.id)) ? d : null;  // never show another account's draft
+  } catch(e){ return null; }
+}
+function clearDraft(){ try{ localStorage.removeItem(DRAFT_KEY); }catch(e){} hideDraftBanner(); }
+function hideDraftBanner(){ const b=document.getElementById('draftBanner'); if(b) b.style.display='none'; }
+
+// Offer to resume a saved draft when entering a FRESH post form (called from showView('post')).
+function maybeOfferDraft(){
+  if(_suppressDraftOffer){ _suppressDraftOffer=false; return; }  // skip on edit
+  const bar = document.getElementById('draftBanner'); if(!bar) return;
+  const d = getDraft();
+  if(!d){ bar.style.display='none'; return; }
+  const ar = currentLang==='ar';
+  let when=''; try{ when=new Date(d.ts).toLocaleDateString(ar?'ar-AE':'en-AE'); }catch(e){}
+  bar.innerHTML = `<span class="draft-msg">${ar?`📝 لديك مسودة إعلان غير منشورة${when?` (${when})`:''}.`:`📝 You have an unpublished draft${when?` (${when})`:''}.`}</span>
+    <span class="draft-acts">
+      <button class="draft-resume" onclick="resumeDraft()">${ar?'متابعة':'Resume'}</button>
+      <button class="draft-discard" onclick="discardDraft()">${ar?'تجاهل':'Discard'}</button>
+    </span>`;
+  bar.style.display='flex';
+}
+
+async function resumeDraft(){
+  const d = getDraft(); if(!d){ hideDraftBanner(); return; }
+  _draftLoading = true;
+  try {
+    Object.keys(d.fields||{}).forEach(id=>{ const el=document.getElementById(id); if(el && d.fields[id]!=null) el.value=d.fields[id]; });
+    if(d.fields && d.fields.pBrand && typeof populateModelOptions==='function') populateModelOptions(d.fields.pBrand);
+    updateTitleCounter(); updateDescCounter();
+    selectedPlan = d.plan || 'free';
+    slotImages=[null,null,null,null]; slotFiles=[null,null,null,null];
+    if(Array.isArray(d.images)){
+      for(let i=0;i<4;i++){
+        const u = d.images[i];
+        if(u && typeof u==='string'){
+          slotImages[i]=u;
+          // rebuild a File from the saved data URL so it uploads to storage normally on publish
+          if(u.startsWith('data:')){
+            try { const b=await (await fetch(u)).blob(); slotFiles[i]=new File([b],`draft_${i}.${(b.type.split('/')[1]||'jpg')}`,{type:b.type||'image/jpeg'}); } catch(_){}
+          }
+        }
+      }
+    }
+    renderImgSlots(); updatePreview();
+  } finally { _draftLoading=false; }
+  hideDraftBanner();
+  if(typeof wizShow==='function') wizShow(d.step||1);
+  toast(currentLang==='ar'?'تم استرجاع مسودتك ✦':'Draft restored ✦');
+}
+
+function discardDraft(){
+  clearDraft();
+  if(typeof resetPostForm==='function') resetPostForm();
+  toast(currentLang==='ar'?'تم حذف المسودة':'Draft discarded');
+}
+
+// Autosave wiring: any input/change in the post form saves a debounced draft.
+document.addEventListener('DOMContentLoaded', ()=>{
+  const wrap = document.getElementById('postFormWrap'); if(!wrap) return;
+  let t=null; const deb=()=>{ clearTimeout(t); t=setTimeout(saveDraft, 600); };
+  wrap.addEventListener('input', deb);
+  wrap.addEventListener('change', deb);
+});
+
+// ════════════════════════════════════════════════
 // POST WIZARD (multi-step) + plan picker
 // ════════════════════════════════════════════════
 let wizStep = 1;
@@ -49,8 +140,8 @@ function wizShow(n){
   if(wizStep===WIZ_TOTAL){ renderPlanPicker(); if(typeof updatePreview==='function') updatePreview(); }
   const wrap=document.getElementById('post-page'); if(wrap) wrap.scrollIntoView({behavior:'smooth', block:'start'});
 }
-function wizBack(){ wizShow(wizStep-1); }
-function wizNext(){ if(!wizValidate(wizStep)) return; wizShow(wizStep+1); }
+function wizBack(){ wizShow(wizStep-1); if(typeof saveDraft==='function') saveDraft(); }
+function wizNext(){ if(!wizValidate(wizStep)) return; wizShow(wizStep+1); if(typeof saveDraft==='function') saveDraft(); }
 function wizValidate(n){
   const ar = currentLang==='ar';
   const v = id => { const e=document.getElementById(id); return e ? e.value.trim() : ''; };
@@ -81,7 +172,7 @@ const AUREX_PLANS = [
   { id:'premium',  name:{ar:'بريميوم',en:'Premium'},price:59.99, days:60, featured:30, refreshes:4 },
 ];
 let selectedPlan = 'free';
-function selectPlan(id){ selectedPlan = id; renderPlanPicker(); }
+function selectPlan(id){ selectedPlan = id; renderPlanPicker(); if(typeof saveDraft==='function') saveDraft(); }
 function renderPlanPicker(){
   const wrap=document.getElementById('planGrid'); if(!wrap) return;
   const ar=currentLang==='ar';
@@ -102,6 +193,16 @@ function renderPlanPicker(){
       ${p.note?`<div class="plan-note">${p.note[ar?'ar':'en']}</div>`:''}
     </div>`;
   }).join('');
+  // Plan-step payment note: free → live now; paid → pay on WhatsApp after publishing.
+  const noteEl = document.getElementById('planPayNote');
+  if(noteEl){
+    const sel = plans.find(p=>p.id===selectedPlan) || plans[0] || {price:0};
+    const isFreeSel = (Number(sel.price)||0) === 0;
+    noteEl.innerHTML = isFreeSel
+      ? (ar?'هذه الباقة مجانية — سيظهر إعلانك فوراً بعد النشر.':'This plan is free — your listing goes live immediately after publishing.')
+      : (ar?`باقة مدفوعة (${(Number(sel.price)||0).toFixed(2)} درهم). بعد النشر ستصلك تعليمات الدفع عبر واتساب، ويُفعَّل إعلانك بعد تأكيد الدفع.`
+            :`Paid plan (${(Number(sel.price)||0).toFixed(2)} AED). After you publish you'll get WhatsApp payment instructions — your listing goes live once we confirm payment.`);
+  }
 }
 
 function renderImgSlots(){
@@ -129,12 +230,13 @@ function handleImg(input){
     slotImages[currentImgSlot]=e.target.result;
     renderImgSlots();
     updatePreview();
+    if(typeof saveDraft==='function') saveDraft();
   };
   reader.readAsDataURL(file);
   input.value='';
 }
 
-function delImg(e,i){ e.stopPropagation(); slotImages[i]=null; slotFiles[i]=null; renderImgSlots(); updatePreview(); }
+function delImg(e,i){ e.stopPropagation(); slotImages[i]=null; slotFiles[i]=null; renderImgSlots(); updatePreview(); if(typeof saveDraft==='function') saveDraft(); }
 
 async function uploadImages(){
   const urls = [];
@@ -293,12 +395,13 @@ async function submitListing(){
     };
 
     let error;
+    let _plan = null, _free = true;
     if(editingListingId){
       ({ error } = await sb.from('listings').update(payload).eq('id', editingListingId).eq('user_id', currentUser.id));
     } else {
       const _plans = (typeof PLANS!=='undefined' && PLANS && PLANS.length) ? PLANS : (typeof AUREX_PLANS!=='undefined' ? AUREX_PLANS : []);
-      const _plan = _plans.find(p=>p.id===selectedPlan) || _plans[0] || {id:'free',price:0,days:7,refreshes:0};
-      const _free = (Number(_plan.price)||0) === 0;
+      _plan = _plans.find(p=>p.id===selectedPlan) || _plans[0] || {id:'free',price:0,days:7,refreshes:0};
+      _free = (Number(_plan.price)||0) === 0;
       ({ error } = await sb.from('listings').insert([{
         ...payload,
         user_id: String(currentUser.id),
@@ -314,11 +417,30 @@ async function submitListing(){
 
     const isEdit = !!editingListingId;
     editingListingId = null;
+    if(!isEdit && typeof clearDraft==='function') clearDraft();  // published → discard the saved draft
     document.getElementById('postFormWrap').style.display='none';
+    // Tailor the success screen: edit vs free (live now) vs paid (pending → pay on WhatsApp).
+    const _ar = currentLang==='ar';
+    const sTitle=document.getElementById('successTitleEl'), sText=document.getElementById('successTextEl'), sPay=document.getElementById('successPayBox');
+    if(sPay){ sPay.style.display='none'; sPay.innerHTML=''; }
+    if(isEdit){
+      if(sTitle) sTitle.textContent = _ar?'تم حفظ التعديلات':'Changes saved';
+      if(sText)  sText.textContent  = _ar?'تم تحديث إعلانك بنجاح.':'Your listing has been updated.';
+    } else if(_free){
+      if(sTitle) sTitle.textContent = _ar?'نُشر الإعلان!':'Listing published!';
+      if(sText)  sText.textContent  = _ar?'ساعتك الآن مرئية في سوق Aurex Movement. سيتواصل المشترون معك عبر واتساب.':'Your watch is now live on Aurex Movement. Buyers will contact you on WhatsApp.';
+    } else {
+      const planName = (_plan && _plan.name) ? _plan.name[_ar?'ar':'en'] : (_plan?_plan.id:'');
+      const priceTxt = ((Number(_plan&&_plan.price)||0).toFixed(2))+' AED';
+      if(sTitle) sTitle.textContent = _ar?'تم النشر — بانتظار الدفع':'Published — pending payment';
+      if(sText)  sText.textContent  = _ar?`باقة ${planName} (${priceTxt}). لن يظهر إعلانك للمشترين حتى نؤكد الدفع.`:`${planName} plan (${priceTxt}). Your listing won't appear to buyers until we confirm payment.`;
+      if(sPay && typeof payBlockHtml==='function'){ sPay.innerHTML = payBlockHtml(planName, priceTxt, `${brand} ${model}`); sPay.style.display='block'; }
+    }
     document.getElementById('successBox').classList.add('show');
     toast(isEdit
       ? (currentLang==='ar'?'تم حفظ التعديلات ✦':'Changes saved ✦')
-      : (currentLang==='ar'?'نُشر إعلانك بنجاح! ✦':'Listing published! ✦'));
+      : (_free?(currentLang==='ar'?'نُشر إعلانك بنجاح! ✦':'Listing published! ✦')
+              :(currentLang==='ar'?'تم النشر — بانتظار الدفع':'Published — pending payment')));
     await loadListings(true); renderHomeGrid();
   } catch(e){
     console.error(e);

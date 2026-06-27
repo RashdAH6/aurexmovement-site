@@ -15,23 +15,26 @@ function renderMyAds(){
   const locale = currentLang==='ar'?'ar-AE':'en-AE';
   container.innerHTML=myListings.map(l=>{
     const priceDisplay=l.price?Number(l.price).toLocaleString(locale)+' AED':(currentLang==='ar'?'تفاوضي':'Negotiable');
-    const imgHtml=l.images&&l.images[0]?`<img src="${l.images[0]}">`:`<div class="ph"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/></svg></div>`;
-    const statusLabel = l.status==='available'?(currentLang==='ar'?'نشط':'Active'):(currentLang==='ar'?'مُباع':'Sold');
+    const imgHtml=l.images&&l.images[0]?`<img src="${escapeHtml(l.images[0])}">`:`<div class="ph"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/></svg></div>`;
+    const isPending = l.planStatus==='pending';
+    const statusLabel = isPending?(currentLang==='ar'?'بانتظار الدفع':'Pending payment'):(l.status==='available'?(currentLang==='ar'?'نشط':'Active'):(currentLang==='ar'?'مُباع':'Sold'));
+    const statusClass = isPending?'status-pending':(l.status==='available'?'status-live':'status-sold-lbl');
     return `<div class="myad-card">
       <div class="myad-img">${imgHtml}</div>
       <div class="myad-body">
         <div class="myad-brand">${l.brand}</div>
         <div class="myad-model">${l.model}</div>
-        <div class="myad-meta">${l.condition||''} ${l.set?'· '+l.set:''} ${l.city?'· '+l.city:''}</div>
+        <div class="myad-meta">${l.condition?tCond(l.condition):''} ${l.set?'· '+tSet(l.set):''} ${l.city?'· '+tCity(l.city):''}</div>
         <div style="margin-top:.5rem;font-size:.65rem;color:rgba(167,167,167,.4)">${new Date(l.createdAt).toLocaleDateString(locale)}</div>
       </div>
       <div class="myad-actions">
         <div>
-          <div class="myad-status ${l.status==='available'?'status-live':'status-sold-lbl'}">${statusLabel}</div>
+          <div class="myad-status ${statusClass}">${statusLabel}</div>
           <div class="myad-price">${priceDisplay}</div>
         </div>
         <div class="myad-btns">
           <button class="myad-btn edit" onclick="editListing('${l.id}')">${currentLang==='ar'?'تعديل':'Edit'}</button>
+          ${isPending?`<button class="myad-btn pay" onclick="payListing('${l.id}')">${currentLang==='ar'?'ادفع للتفعيل':'Pay to activate'}</button>`:''}
           ${l.status==='available'
             ?`<button class="myad-btn" onclick="markSold('${l.id}')">${L.markSoldBtn}</button>`
             :`<button class="myad-btn" onclick="relistListing('${l.id}')">${L.relistBtn}</button>`}
@@ -81,6 +84,7 @@ function editListing(id){
   if(!l || l.userId !== currentUser?.id){ toast(currentLang==='ar'?'غير مصرح':'Not authorized'); return; }
 
   // showView('post') resets editingListingId — so we set it inside setTimeout
+  if(typeof _suppressDraftOffer!=='undefined') _suppressDraftOffer = true;  // don't show the draft banner when editing
   showView('post');
 
   setTimeout(() => {
@@ -108,6 +112,7 @@ function editListing(id){
     set('pSize',  l.size);
     set('pGender', l.gender);
     set('pBracelet', l.bracelet);
+    const _pw=document.getElementById('pWarranty'); if(_pw) _pw.value = l.warranty ? 'yes' : 'no';
     document.getElementById('pTerms').checked = true;
 
     // Load existing images as previews (URLs only, no re-upload unless changed)
@@ -122,5 +127,21 @@ function editListing(id){
     const title = document.getElementById('postTitleEl');
     if(title) title.innerHTML = currentLang==='ar' ? 'تعديل <em>إعلانك</em>' : 'Edit Your <em>Listing</em>';
   }, 50);
+}
+
+// "Pay to activate" — opens WhatsApp to pay for a pending paid listing's plan.
+function payListing(id){
+  const l = listings.find(x=>x.id===id); if(!l) return;
+  const ar = currentLang==='ar';
+  const pl = ((typeof PLANS!=='undefined' && PLANS) ? PLANS : []).find(p=>p.id===l.plan);
+  const planName = pl ? pl.name[ar?'ar':'en'] : (l.plan||'');
+  const priceTxt = ((Number(pl&&pl.price)||0).toFixed(2))+' AED';
+  const link = (typeof payWaLink==='function') ? payWaLink(planName, priceTxt, `${l.brand} ${l.model||''}`.trim()) : '';
+  if(link){
+    const a=document.createElement('a'); a.href=link; a.target='_blank'; a.rel='noopener';
+    document.body.appendChild(a); a.click(); a.remove();
+  } else {
+    toast(ar?'سيتم تزويدك بتفاصيل الدفع قريباً':'Payment details will be shared shortly');
+  }
 }
 

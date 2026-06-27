@@ -4,6 +4,16 @@
 <meta charset="UTF-8">
 <base href="/">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<script>
+  /* Pick language before first paint: saved choice wins, else the visitor's browser language
+     (Arabic browsers → Arabic, everyone else → English). Avoids an Arabic→English flash. */
+  (function(){
+    var saved=null; try{ saved=localStorage.getItem('aurex_lang'); }catch(e){}
+    var lang = saved || ((navigator.language||navigator.userLanguage||'en').toLowerCase().indexOf('ar')===0 ? 'ar' : 'en');
+    var el=document.documentElement; el.lang=lang; el.dir=(lang==='ar'?'rtl':'ltr');
+    window.__aurexLang=lang;
+  })();
+</script>
 <meta name="google-site-verification" content="Aj7XLxpf5uBnJ1-w_TPzYK_hm-DuLrASV1FsOTSgg9I">
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
@@ -493,6 +503,7 @@
       </div>
 
       <div id="postFormWrap">
+        <div class="draft-banner" id="draftBanner" style="display:none"></div>
         <div class="wiz-progress" id="wizProgress"></div>
         <div class="wstep" data-step="3" hidden>
         <!-- Images -->
@@ -746,6 +757,7 @@
         <div class="post-section">
           <span class="post-section-title" id="postSecPlan">اختر باقتك</span>
           <div class="plan-grid" id="planGrid"></div>
+          <p class="plan-pay-note" id="planPayNote"></p>
         </div>
 
         <!-- Preview -->
@@ -783,6 +795,7 @@
         <div class="success-icon">✦</div>
         <h2 class="success-title" id="successTitleEl">نُشر الإعلان!</h2>
         <p class="success-text" id="successTextEl">ساعتك الآن مرئية في سوق Aurex Movement. المشترون سيتواصلون معك مباشرة عبر الواتساب.</p>
+        <div class="success-pay" id="successPayBox" style="display:none"></div>
         <div style="display:flex;gap:1rem;justify-content:center;flex-wrap:wrap">
           <button class="btn-primary" id="successBrowseBtn" onclick="showView('listings')">تصفح السوق</button>
           <button class="btn-secondary" id="successMyAdsBtn" onclick="showView('myads')">إعلاناتي</button>
@@ -1144,7 +1157,7 @@ if(isIos && !isStandalone && !dismissed){
         <img src="/icon.svg" style="width:36px;height:36px;border-radius:8px;flex-shrink:0">
         <div>
           <div style="font-size:.78rem;font-weight:700;color:#F5F5F5">Aurex Movement</div>
-          <div style="font-size:.68rem;color:#A7A7A7">اضغط <span style="font-size:.85rem">⬜</span> ثم "Add to Home Screen"</div>
+          <div style="font-size:.68rem;color:#A7A7A7">${currentLang==='ar' ? `اضغط <span style="font-size:.85rem">⬜</span> ثم "إضافة إلى الشاشة الرئيسية"` : `Tap <span style="font-size:.85rem">⬜</span> then "Add to Home Screen"`}</div>
         </div>
       </div>
       <button onclick="document.getElementById('pwa-banner').remove();localStorage.setItem('pwa_banner_dismissed','1')"

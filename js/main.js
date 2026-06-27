@@ -35,6 +35,10 @@ async function init(){
       localStorage.removeItem('aurex_session');
     }
     await loadFavorites();
+    // repaint the current grid so saved-favorite hearts fill in immediately
+    if(currentView==='home' && typeof renderHomeGrid==='function') renderHomeGrid();
+    else if(currentView==='listings' && typeof filterListings==='function') filterListings();
+    else if(currentView==='favorites' && typeof renderFavorites==='function') renderFavorites();
     updateNavForUser();
   });
 

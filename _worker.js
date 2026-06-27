@@ -7,6 +7,11 @@ const ANON = 'sb_publishable_pheGlJPG-oM5oPJqQAI1kQ_gYX7lnc_'; // publishable ke
 const SITE = 'https://aurexmovement.com';
 const OG_DEFAULT = SITE + '/og-image.png';
 
+const COND_EN = {'جديدة':'New','شبه جديدة':'Like New','ممتازة':'Excellent','جيدة':'Good'};
+const CITY_EN = {'دبي':'Dubai','أبوظبي':'Abu Dhabi','الشارقة':'Sharjah','عجمان':'Ajman','رأس الخيمة':'Ras Al Khaimah','الفجيرة':'Fujairah','أم القيوين':'Umm Al Quwain'};
+function enCond(v){ return COND_EN[v] || v || ''; }
+function enCity(v){ return CITY_EN[v] || v || ''; }
+
 function esc(s){ return String(s==null?'':s).replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'})[c]); }
 function money(n){ return String(n).replace(/\B(?=(\d{3})+(?!\d))/g, ','); }
 function jsonLd(obj){ return JSON.stringify(obj).replace(/</g, '\\u003c'); }
@@ -25,7 +30,7 @@ function buildSeo(l){
   const name = (l.title && l.title.trim()) || [l.brand, l.model].filter(Boolean).join(' ');
   const priceTxt = l.price ? money(l.price) + ' AED' : 'Price on request';
   const title = `${name}${l.ref_number ? ' Ref. ' + l.ref_number : ''} | Aurex Movement`;
-  const desc = `${[l.brand, l.model].filter(Boolean).join(' ')}${l.year ? ', ' + l.year : ''}${l.condition ? ', ' + l.condition : ''} for sale in ${l.city || 'UAE'}. ${priceTxt}. Authentic luxury watches — Aurex Movement, UAE & GCC.`;
+  const desc = `${[l.brand, l.model].filter(Boolean).join(' ')}${l.year ? ', ' + l.year : ''}${l.condition ? ', ' + enCond(l.condition) : ''} for sale in ${enCity(l.city) || 'UAE'}. ${priceTxt}. Authentic luxury watches — Aurex Movement, UAE & GCC.`;
   const img = (Array.isArray(l.images) && l.images[0]) ? l.images[0] : OG_DEFAULT;
   const wurl = `${SITE}/watch/${l.id}`;
   const ogTitle = `${name} — ${priceTxt}`;
@@ -120,9 +125,21 @@ async function aiListing(request, env){
   } catch(e){ return _json({ error:'fetch_failed' }, 502); }
 }
 
+// Safety net: never serve local/dev files even if a bad deploy bundles them.
+// Blocks dotfile dirs (.claude, .git, .wrangler), node_modules, and *.backup —
+// but allows /.well-known/ (needed for mobile app deep-linking / verification).
+function isBlocked(p){
+  if(p.startsWith('/.well-known/')) return false;
+  return p.startsWith('/.') || p.includes('/.') ||
+         p.startsWith('/node_modules/') || p.endsWith('.backup');
+}
+
 export default {
   async fetch(request, env){
     const url = new URL(request.url);
+    if(isBlocked(url.pathname)){
+      return new Response('Not found', { status: 404, headers: { 'content-type': 'text/plain; charset=utf-8' } });
+    }
     const m = url.pathname.match(/^\/watch\/([^\/]+)\/?$/);
     if(m) return renderWatch(m[1], env, url);
     if(url.pathname === '/api/ai') return aiListing(request, env);

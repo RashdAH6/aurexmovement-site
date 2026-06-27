@@ -25,7 +25,7 @@ async function showView(v){
   if(v==='favorites'){ await loadListings(); await loadFavorites(); renderFavorites(); }
   if(v==='ai'){ await loadListings(); renderAI(); }
   if(v==='home'){ await loadListings(); renderHomeGrid(); }
-  if(v==='post'){ editingListingId = null; resetPostForm(); }
+  if(v==='post'){ editingListingId = null; resetPostForm(); if(typeof maybeOfferDraft==='function') maybeOfferDraft(); }
   if(v==='profile'){ await loadListings(); loadProfile(); }
   if(v==='admin'){ if(!canModerate()) return showView('home'); await loadListings(); if(isOwner() && typeof loadStaff==='function') await loadStaff(); if(isAdmin() && typeof loadAnalytics==='function') await loadAnalytics(); renderAdmin(); }
   if(v==='dealer'){ await loadListings(); renderDealer(); }

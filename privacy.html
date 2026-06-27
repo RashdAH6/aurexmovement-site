@@ -114,11 +114,16 @@ footer a{color:var(--gold)}
           <tr><td>بيانات الهوية</td><td>الاسم الكامل</td><td>إنشاء الحساب وتعريف المستخدم</td></tr>
           <tr><td>بيانات التواصل</td><td>البريد الإلكتروني، رقم الواتساب</td><td>التحقق من الهوية وتواصل المشترين</td></tr>
           <tr><td>بيانات الإعلانات</td><td>صور الساعات، الأسعار، الأوصاف</td><td>عرض الإعلانات على المنصة</td></tr>
+          <tr><td>الصورة الشخصية (الصورة الرمزية)</td><td>صورة الملف الشخصي التي ترفعها أو تُستورَد من حساب Google</td><td>عرض هويتك على حسابك وإعلاناتك</td></tr>
           <tr><td>بيانات التقني</td><td>عنوان IP، نوع المتصفح</td><td>الأمان ومنع الاحتيال</td></tr>
           <tr><td>بيانات الاستخدام</td><td>الصفحات التي زرتها، الإعلانات التي فتحتها</td><td>تحسين تجربة المستخدم</td></tr>
         </table>
       </div>
 
+      <p style="margin-top:1rem">تُرفَع جميع الصور (صور الإعلانات والصور الشخصية/الرمزية) وتُخزَّن في خدمة Supabase Storage التي تعمل كمعالج بيانات لدينا.</p>
+      <div class="highlight">
+        تنبيه: قد تحتوي الصور التي ترفعها على بيانات وصفية مدمجة (Metadata/EXIF) مثل بيانات الموقع الجغرافي. ننصحك بالتأكد من إزالة هذه البيانات من صورك قبل رفعها إن لم ترغب في مشاركتها.
+      </div>
       <p style="margin-top:1rem">لا نجمع أبداً بيانات الدفع أو بطاقات الائتمان، إذ جميع المدفوعات تتم خارج المنصة مباشرة.</p>
     </div>
 
@@ -158,6 +163,8 @@ footer a{color:var(--gold)}
       <p><strong>لا نبيع بياناتك لأي طرف ثالث.</strong> نشارك بياناتك فقط في الحالات التالية:</p>
       <ul>
         <li><strong>Supabase:</strong> مزود خدمة قاعدة البيانات والمصادقة لدينا. يعمل كمعالج بيانات بموجب اتفاقية معالجة بيانات صارمة.</li>
+        <li><strong>تسجيل الدخول عبر Google:</strong> عند اختيارك تسجيل الدخول باستخدام "الدخول عبر Google"، تتلقى شركة Google بيانات تسجيل الدخول والهوية الخاصة بك ومعالجتها وفق <a href="https://policies.google.com/privacy" target="_blank" rel="noopener">سياسة الخصوصية الخاصة بـ Google</a>. كما قد يُستورَد اسم ملفك الشخصي وصورتك (الصورة الرمزية) من حساب Google لديك ويُعرَضان على منصة Aurex.</li>
+        <li><strong>Cloudflare:</strong> مزود خدمات الاستضافة وشبكة توصيل المحتوى (CDN) لدينا. يعمل كمعالج بيانات لتقديم محتوى المنصة وتأمينها وتحسين أدائها.</li>
         <li><strong>السلطات القانونية:</strong> إذا طُلب منا الكشف عن البيانات بموجب أمر قضائي أو قانوني نافذ.</li>
         <li><strong>حماية الحقوق:</strong> إذا اعتقدنا بحسن نية أن الكشف ضروري لحماية حقوقنا أو حقوق المستخدمين أو منع الاحتيال.</li>
       </ul>
@@ -252,7 +259,7 @@ footer a{color:var(--gold)}
         <li>البريد الإلكتروني: <a href="mailto:support@aurexmovement.com">support@aurexmovement.com</a></li>
         <li>الموضوع: "طلب خصوصية — Privacy Request"</li>
       </ul>
-      <p>يحق لك أيضاً تقديم شكوى لدى الهيئة الوطنية لتنظيم الاتصالات (TRA) في دولة الإمارات إن لم تكن راضياً عن استجابتنا.</p>
+      <p>يحق لك أيضاً تقديم شكوى لدى الهيئة العامة لتنظيم الاتصالات والحكومة الرقمية (TDRA) في دولة الإمارات إن لم تكن راضياً عن استجابتنا.</p>
     </div>
 
   </div>
@@ -281,9 +288,14 @@ footer a{color:var(--gold)}
           <tr><td>Identity Data</td><td>Full name</td><td>Account creation and user identification</td></tr>
           <tr><td>Contact Data</td><td>Email address, WhatsApp number</td><td>Identity verification and buyer contact</td></tr>
           <tr><td>Listing Data</td><td>Watch photos, prices, descriptions</td><td>Displaying listings on the Platform</td></tr>
+          <tr><td>Profile Photo (Avatar)</td><td>Profile picture you upload or imported from your Google account</td><td>Displaying your identity on your account and listings</td></tr>
           <tr><td>Technical Data</td><td>IP address, browser type</td><td>Security and fraud prevention</td></tr>
           <tr><td>Usage Data</td><td>Pages visited, listings viewed</td><td>Improving user experience</td></tr>
         </table>
+      </div>
+      <p style="margin-top:1rem">All uploaded images (listing photos and profile photos/avatars) are uploaded to and stored in Supabase Storage, which acts as our data processor.</p>
+      <div class="highlight">
+        Please note: photos you upload may contain embedded metadata (EXIF), such as location data. We recommend removing this metadata from your images before uploading if you do not wish to share it.
       </div>
       <p style="margin-top:1rem">We never collect payment data or credit card information, as all payments occur directly off the Platform.</p>
     </div>
@@ -324,6 +336,8 @@ footer a{color:var(--gold)}
       <p><strong>We do not sell your data to any third party.</strong> We share your data only in the following cases:</p>
       <ul>
         <li><strong>Supabase:</strong> Our database and authentication service provider, acting as a data processor under a strict data processing agreement.</li>
+        <li><strong>Sign in with Google:</strong> When you choose to sign in using "Sign in with Google", Google receives your sign-in and identity data, which it processes in accordance with <a href="https://policies.google.com/privacy" target="_blank" rel="noopener">Google's Privacy Policy</a>. Your Google profile name and photo (avatar) may also be imported from your Google account and displayed on Aurex.</li>
+        <li><strong>Cloudflare:</strong> Our hosting and content delivery network (CDN) provider, acting as a data processor to serve, secure, and improve the performance of the Platform.</li>
         <li><strong>Legal authorities:</strong> If required to disclose data under a valid court order or legal obligation.</li>
         <li><strong>Rights protection:</strong> If we reasonably believe disclosure is necessary to protect our rights, users' rights, or prevent fraud.</li>
       </ul>

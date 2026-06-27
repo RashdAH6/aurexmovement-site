@@ -1,6 +1,6 @@
 // theme.js — language/theme state vars + applyTheme / toggleTheme.
 
-let currentLang = localStorage.getItem('aurex_lang')||'ar';
+let currentLang = window.__aurexLang || localStorage.getItem('aurex_lang') || ((navigator.language||'en').toLowerCase().indexOf('ar')===0?'ar':'en');
 let currentTheme = localStorage.getItem('aurex_theme')||'dark';
 
 function applyTheme(theme){

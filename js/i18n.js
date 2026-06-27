@@ -141,6 +141,9 @@ function setLang(lang){
   document.getElementById('pillAr').classList.toggle('active', lang==='ar');
   document.getElementById('pillEn').classList.toggle('active', lang==='en');
   applyTranslations();
+  // reset the AI chat so its greeting + bubbles re-render in the newly selected language
+  var _aic = document.getElementById('aiChat');
+  if(_aic){ delete _aic.dataset.init; _aic.innerHTML=''; if(currentView==='ai' && typeof renderAI==='function') renderAI(); }
 }
 
 function t(key){ return T[currentLang][key]||T['ar'][key]||key; }

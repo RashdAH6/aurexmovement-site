@@ -15,14 +15,16 @@ async function loadListings(force = false){
   const now = Date.now();
   if(!force && listings.length > 0 && (now - _listingsCacheTime) < LISTINGS_TTL) return;
   try {
-    const [listRes, featRes, verRes, profRes, planRes] = await Promise.all([
+    const [listRes, featRes, verRes, profRes, planRes, setRes] = await Promise.all([
       sb.from('listings').select('*').order('created_at', { ascending: false }).limit(500),
       sb.from('featured_listings').select('listing_id,until'),   // may not exist yet — handled gracefully
       sb.from('verified_sellers').select('user_id'),             // may not exist yet — handled gracefully
       sb.from('profiles').select('user_id,name,avatar_url'),     // may not exist yet — handled gracefully
-      sb.from('plans').select('*').order('sort')                 // may not exist yet — handled gracefully
+      sb.from('plans').select('*').order('sort'),                // may not exist yet — handled gracefully
+      sb.from('app_settings').select('key,value')                // may not exist yet — handled gracefully
     ]);
     if(listRes.error) throw listRes.error;
+    if(setRes && setRes.data){ const s={}; setRes.data.forEach(r=>{ s[r.key]=r.value; }); SETTINGS=s; }
     const featMap = {};
     (featRes.data||[]).forEach(f=>{ if(!f.until || Date.parse(f.until) > now) featMap[f.listing_id] = true; });
     const verSet = new Set((verRes.data||[]).map(v=>v.user_id));
@@ -236,6 +238,19 @@ function _renderAdminPanels(pending){
   } else if(isAdmin()){
     html += `<div class="admin-panel"><div class="admin-panel-t">${ar?'الباقات':'Plans'}</div><div style="font-size:.78rem;color:var(--grey);padding:.4rem">${ar?'شغّل AUREX_add_plans.sql لإدارة الأسعار هنا':'Run AUREX_add_plans.sql to manage pricing here'}</div></div>`;
   }
+  // Payment settings — the WhatsApp number + message shown to sellers who pick a paid plan.
+  if(isAdmin()){
+    const s = (typeof SETTINGS!=='undefined' && SETTINGS) ? SETTINGS : {};
+    html += `<div class="admin-panel"><div class="admin-panel-t">${ar?'إعدادات الدفع':'Payment settings'}</div>
+      <div class="pay-edit">
+        <label>${ar?'رقم واتساب للدفع':'Payment WhatsApp'}<input type="tel" id="set_pay_wa" value="${escapeHtml(s.pay_whatsapp||'')}" placeholder="5XXXXXXXX"></label>
+        <label>${ar?'رسالة الدفع (إنجليزي)':'Pay message (EN)'}<textarea id="set_pay_en" rows="2">${escapeHtml(s.pay_note_en||'')}</textarea></label>
+        <label>${ar?'رسالة الدفع (عربي)':'Pay message (AR)'}<textarea id="set_pay_ar" rows="2">${escapeHtml(s.pay_note_ar||'')}</textarea></label>
+        <button class="am-tg on" onclick="adminSavePayment()">${ar?'حفظ':'Save'}</button>
+      </div>
+      <div class="pay-edit-hint">${ar?'يُعرض للبائع بعد اختيار باقة مدفوعة. إن لم يُحفظ، شغّل AUREX_add_settings.sql مرة واحدة.':"Shown to sellers who pick a paid plan. If it won't save, run AUREX_add_settings.sql once."}</div>
+    </div>`;
+  }
   // Users panel — every seller, with verify + jump-to-their-ads.
   const umap={};
   listings.forEach(l=>{ if(!l.userId) return; if(!umap[l.userId]) umap[l.userId]={id:l.userId,name:l.userName||(ar?'بائع':'Seller'),avatar:l.sellerAvatar||'',count:0,live:0,verified:false}; const u=umap[l.userId]; u.count++; if(isLive(l))u.live++; if(l.verified)u.verified=true; if(!u.avatar&&l.sellerAvatar)u.avatar=l.sellerAvatar; });
@@ -353,6 +368,22 @@ async function adminSavePlan(id){
   if(error){ toast('Error: '+error.message); return; }
   await loadListings(true);
   toast(currentLang==='ar'?'تم حفظ الباقة ✦':'Plan saved ✦');
+  renderAdmin();
+}
+
+// Save the off-platform payment info (WhatsApp number + bilingual pay message).
+async function adminSavePayment(){
+  if(!isAdmin()) return;
+  const v = id => { const e=document.getElementById(id); return e ? e.value.trim() : ''; };
+  const rows = [
+    { key:'pay_whatsapp', value: v('set_pay_wa') },
+    { key:'pay_note_en',  value: v('set_pay_en') },
+    { key:'pay_note_ar',  value: v('set_pay_ar') },
+  ];
+  const { error } = await sb.from('app_settings').upsert(rows, { onConflict:'key' });
+  if(error){ toast('Error: '+error.message); return; }
+  await loadListings(true);
+  toast(currentLang==='ar'?'تم حفظ إعدادات الدفع ✦':'Payment settings saved ✦');
   renderAdmin();
 }
 
@@ -484,6 +515,7 @@ function filterListings(){
   let results = listings.filter(l=>{
     if(isExpired(l)) return false;
     if(l.status==='hidden') return false;   // admin-deactivated listings stay out of the market
+    if(l.planStatus==='pending') return false;   // paid listing awaiting owner payment-approval
     if(brand && l.brand!==brand) return false;
     if(cond && canonCond(l.condition)!==cond) return false;
     if(set && canonSet(l.set)!==set) return false;
@@ -610,7 +642,7 @@ async function askAI(){
       ?`بناءً على <b>${matches.length}</b> إعلان على Aurex:<br>◈ النطاق: <b>${fmt(min)}</b> – <b>${fmt(max)}</b><br>◈ المتوسط: <b>${fmt(avg)}</b>`
       :`Based on <b>${matches.length}</b> listing(s) on Aurex:<br>◈ Range: <b>${fmt(min)}</b> – <b>${fmt(max)}</b><br>◈ Average: <b>${fmt(avg)}</b>`);
   }
-  const top = matches.filter(l=>l.status==='available').slice(0,4);
+  const top = matches.filter(l=>isLive(l)).slice(0,4);
   if(top.length) aiSay('<div class="cards-grid">'+top.map(l=>renderCard(l)).join('')+'</div>');
 }
 

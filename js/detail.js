@@ -70,7 +70,7 @@ function openDetail(id, skipHash){
       </div>
       <div class="detail-seller" ${l.userId?`onclick="openDealer('${l.userId}')" style="cursor:pointer"`:''}>
         <div class="seller-avatar">${l.sellerAvatar?`<img src="${escapeHtml(l.sellerAvatar)}" alt="">`:escapeHtml(seller.name.charAt(0))}</div>
-        <div><div class="seller-name">${escapeHtml(seller.name)}${l.verified?` <span class="verified-badge" title="${currentLang==='ar'?'تاجر موثق':'Verified Seller'}"><svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg></span>`:''}</div><div class="seller-since">${l.verified?(currentLang==='ar'?'تاجر موثق':'Verified Seller'):L.sellerLabel} · ${escapeHtml(l.city||'UAE')}</div></div>
+        <div><div class="seller-name">${escapeHtml(seller.name)}${l.verified?` <span class="verified-badge" title="${currentLang==='ar'?'تاجر موثق':'Verified Seller'}"><svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg></span>`:''}</div><div class="seller-since">${l.verified?(currentLang==='ar'?'تاجر موثق':'Verified Seller'):L.sellerLabel} · ${escapeHtml(tCity(l.city)||'UAE')}</div></div>
       </div>
       ${isLive(l)?`
       <div id="contactReveal" class="contact-reveal">
@@ -100,7 +100,7 @@ function openDetail(id, skipHash){
           ${l.condition?`<div class="spec-item"><div class="spec-label">${L.specsCond}</div><div class="spec-val">${escapeHtml(tCond(l.condition))}</div></div>`:''}
           ${l.set?`<div class="spec-item"><div class="spec-label">${L.specsSet}</div><div class="spec-val">${escapeHtml(tSet(l.set))}</div></div>`:''}
           ${l.dial?`<div class="spec-item"><div class="spec-label">${L.specsDial}</div><div class="spec-val">${escapeHtml(l.dial)}</div></div>`:''}
-          ${l.city?`<div class="spec-item"><div class="spec-label">${L.specsCity}</div><div class="spec-val">${escapeHtml(l.city)}</div></div>`:''}
+          ${l.city?`<div class="spec-item"><div class="spec-label">${L.specsCity}</div><div class="spec-val">${escapeHtml(tCity(l.city))}</div></div>`:''}
           ${l.movement?`<div class="spec-item"><div class="spec-label">${currentLang==='ar'?'الحركة':'Movement'}</div><div class="spec-val">${escapeHtml(tSpecVal(l.movement))}</div></div>`:''}
           ${l.material?`<div class="spec-item"><div class="spec-label">${currentLang==='ar'?'مادة العلبة':'Case Material'}</div><div class="spec-val">${escapeHtml(tSpecVal(l.material))}</div></div>`:''}
           ${l.size?`<div class="spec-item"><div class="spec-label">${currentLang==='ar'?'قياس العلبة':'Case Size'}</div><div class="spec-val">${escapeHtml(l.size)} ${currentLang==='ar'?'مم':'mm'}</div></div>`:''}

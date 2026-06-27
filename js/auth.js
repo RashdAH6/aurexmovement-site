@@ -130,7 +130,7 @@ function updateNavForUser(){
       else { a.style.backgroundImage=''; a.textContent = currentUser.name.charAt(0).toUpperCase(); }
     }
     if(dn) dn.textContent = currentUser.name;
-    if(dw) dw.textContent = '+971 '+currentUser.wa;
+    if(dw) dw.textContent = currentUser.wa ? '+'+waNumber(currentUser.wa) : '';
   } else {
     g.style.display='flex'; u.style.display='none';
     if(a){ a.style.backgroundImage=''; a.textContent='?'; }
